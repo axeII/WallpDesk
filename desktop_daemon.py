@@ -96,7 +96,11 @@ class Desk_deamon:
         #control inputs
         if len(commands) > 1:
             #more commands
-            command_list[commands[0]](file_name,commands)
+            if len(commands) == 2:
+                command_list[commands[0]](file_name,commands[1])
+            else:
+                #so far there are no special tasks for more commands
+                command_list[commands[0]](file_name,commands)
         else:
             command_list[commands[0]](file_name)
 
