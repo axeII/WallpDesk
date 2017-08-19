@@ -5,6 +5,8 @@ This is desktop deamon for checking desktop files
 __author__ = 'ales lerch'
 
 import re
+import time
+import shutil
 from enum import Enum
 
 class Lexer_state(Enum):
@@ -14,11 +16,16 @@ class Lexer_state(Enum):
 
 class Desk_deamon:
 
-    def __init__(self):
+    def __init__(self,tosleep):
         self.files = []
         self.types = (".jpg",".png",".jpeg",".tiff")
-        self.tokens = []
-        self.commands = []
+        self.to_sleep = tosleep
+
+        while True:
+            time.sleep(self.to_sleep)
+            self.get_dfiles()
+            for file_ in self.files:
+                self.evaluate(self.lexer(os.path.basename(file_)))
 
     def get_dfiles(self):
         for f in os.listdir("~/Desktop/"):
@@ -26,10 +33,15 @@ class Desk_deamon:
                 self.files.append(f)
 
     def lexer(self,text):
-        identify = re.compitle("\w*\_*\(?\)?\.*-*")
-        state = Lexer_state.s
+        """
+        token stands for file name, commands are operations
+        that should be done"""
         token = ""
         command = ""
+        commands = []
+        state = Lexer_state.s
+        identify = re.compitle("\w*\_*\(?\)?\.*-*")
+
         while text != "":
             if state == Lexer_state.s:
                 if text[0] in [' ']:
@@ -52,20 +64,39 @@ class Desk_deamon:
                     text = text[1:]
                 elif text[0] == '}':
                     text = text[1:]
-                    #saving command more commands
-                    self.commands.append(command)
+                    commands.append(command.lower())
                     command = ""
                     state = Lexer_state.s
+
             elif state == Lexer_state.word:
                 if identify.match(text[0]):
                     token += text[0]
                     text = text[1:]
                 else:
+                    #should contiue? file_name should be done
                     state = Lexer_state.s
-                    #saving token should be just one
-                    self.tokens.append(token)
-                    token =""
 
-    def evaluate(self):
-        pass
+        return (token,commands)
+
+    def evaluate(self,file_name,commands):
+
+        def set_wallpaper(img):
+            db_file = "~/Library/Application Support/Dock/desktoppicture.db"
+            subprocess.call(["sqlite3", db_file, f"update data set value = '{img}'"])
+            subprocess.call(["killall", "Dock"])
+
+        command_list = {
+                "pixiv": lambda n : shutil.move(f"~/Desktop/{n}", "~/Pictures/pix-girls/"),
+                "daytime" : lambda n : shutil.move(f"~/Desktop/{n}","~/TimeDayWal"),
+                "mv" : lambda f, t : shutil.move(f"~/Desktop/{f}",f"{t}"),
+                "trash" : lambda n : shutil.move(f"~/Desktop/{n}", "~/Pictures/pix-girls/"),
+                "wall" : lambda n : set_wallpaper(n),
+                }
+
+        #control inputs
+        if len(commands) > 1:
+            #more commands
+            command_list[commands[0]](file_name,commands)
+        else:
+            command_list[commands[0]](file_name)
 
