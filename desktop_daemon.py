@@ -81,12 +81,14 @@ class Desk_deamon:
     def evaluate(self,file_name,commands):
 
         def set_wallpaper(img):
+            #same function is in wallpaper_changer
             db_file = "~/Library/Application Support/Dock/desktoppicture.db"
             subprocess.call(["sqlite3", db_file, f"update data set value = '{img}'"])
             subprocess.call(["killall", "Dock"])
 
         command_list = {
                 "pixiv": lambda n : shutil.move(f"~/Desktop/{n}", "~/Pictures/pix-girls/"),
+                "meme": lambda n : shutil.move(f"~/Desktop/{n}", "~/Pictures/Meme/"),
                 "daytime" : lambda n : shutil.move(f"~/Desktop/{n}","~/TimeDayWal"),
                 "mv" : lambda f, t : shutil.move(f"~/Desktop/{f}",f"{t}"),
                 "trash" : lambda n : shutil.move(f"~/Desktop/{n}", "~/Pictures/pix-girls/"),
