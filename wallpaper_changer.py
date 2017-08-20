@@ -7,9 +7,9 @@ __author__ = 'ales lerch'
 
 class Wall_changer:
 
-    def __init__(self):
+    def __init__(self,dir_to_imgs = None):
         """connect this module to database one"""
-        pass
+        self.directory = dir_to_imgs
 
     def set_wallpaper(self,img):
         db_file = "~/Library/Application Support/Dock/desktoppicture.db"
@@ -17,6 +17,7 @@ class Wall_changer:
         subprocess.call(["killall", "Dock"])
 
     def set_timer(self):
+        """ Based on time wallpaper can change"""
         pass
 
     def choose_image(self):
