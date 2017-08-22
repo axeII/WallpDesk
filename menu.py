@@ -5,7 +5,7 @@ Menu bar module for setting menu bar setup for OSX
 __author__ = 'ales lerch'
 
 
-class Menu_bar:
+class Bar:
 
     def __init__(self):
         pass

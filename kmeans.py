@@ -5,7 +5,7 @@ This module is for checking image infomartion eg color scheme
 __author__ = 'ales lerch'
 
 
-class Image_checker:
+class Analyzer:
 
     def __init__(self,path_to_img):
         self.img = path_to_img

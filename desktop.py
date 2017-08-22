@@ -5,6 +5,7 @@ This is desktop deamon for checking desktop files
 __author__ = 'ales lerch'
 
 import re
+import wall
 import time
 import shutil
 from enum import Enum
@@ -14,23 +15,18 @@ class Lexer_state(Enum):
     operation = 2
     word = 3
 
-class Desk_deamon:
+class Daemon(wall.Paper):
 
     def __init__(self,tosleep):
-        self.files = []
-        self.types = (".jpg",".png",".jpeg",".tiff")
         self.to_sleep = tosleep
+        super().__init__(self,"~/Desktop")
 
         while True:
             time.sleep(self.to_sleep)
             self.get_dfiles()
+            super().get_image_files()
             for file_ in self.files:
                 self.evaluate(self.lexer(os.path.basename(file_)))
-
-    def get_dfiles(self):
-        for f in os.listdir("~/Desktop/"):
-            if f.splitext[1] in self.types:
-                self.files.append(f)
 
     def lexer(self,text):
         """
@@ -80,19 +76,13 @@ class Desk_deamon:
 
     def evaluate(self,file_name,commands):
 
-        def set_wallpaper(img):
-            #same function is in wallpaper_changer
-            db_file = "~/Library/Application Support/Dock/desktoppicture.db"
-            subprocess.call(["sqlite3", db_file, f"update data set value = '{img}'"])
-            subprocess.call(["killall", "Dock"])
-
         command_list = {
                 "pixiv": lambda n : shutil.move(f"~/Desktop/{n}", "~/Pictures/pix-girls/"),
                 "meme": lambda n : shutil.move(f"~/Desktop/{n}", "~/Pictures/Meme/"),
                 "daytime" : lambda n : shutil.move(f"~/Desktop/{n}","~/TimeDayWal"),
                 "mv" : lambda f, t : shutil.move(f"~/Desktop/{f}",f"{t}"),
                 "trash" : lambda n : shutil.move(f"~/Desktop/{n}", "~/Pictures/pix-girls/"),
-                "wall" : lambda n : set_wallpaper(n),
+                "wall" : lambda n : super().set_wallpaper(n),
                 }
 
         #control inputs
