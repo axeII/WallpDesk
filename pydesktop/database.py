@@ -34,7 +34,7 @@ class DB_lite:
         if data:
             try:
                 self.cursor.execute("""INSERT INTO wallpapers(name, path, type)
-                                  VALUES({data.name},{data.path},{data.type})""")
+                                  VALUES({data["name"]},{data["path"]},{data["type"]})""")
                 self.db.commit()
             except sqlite3.IntegrityError:
                 print('[Error] Record already exists')

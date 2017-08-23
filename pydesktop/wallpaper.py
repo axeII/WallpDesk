@@ -20,6 +20,11 @@ class Editor(wall.Paper):
 
         self.get_images()
         for img in self.img_files:
+            data = {
+                "name" : os.path.basename(img),
+                "path" : os.path.dirname(img),
+                "type" : km.check_image_color(img),
+            }
             self.db.new_item(img)
 
     def set_timer(self):
