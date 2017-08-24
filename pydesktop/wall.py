@@ -5,6 +5,7 @@ This is wallpaper changer, module for changing desktop background by rules
 __author__ = 'ales lerch'
 
 import os
+import subprocess
 
 class Paper:
 
@@ -17,6 +18,9 @@ class Paper:
         db_file = "~/Library/Application Support/Dock/desktoppicture.db"
         subprocess.call(["sqlite3", db_file, f"update data set value = '{img}'"])
         subprocess.call(["killall", "Dock"])
+
+    def get_current_wallpaper(self):
+        pass
 
     def get_images_files(self):
         if self.directory:

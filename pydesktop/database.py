@@ -39,9 +39,12 @@ class DB_lite:
             except sqlite3.IntegrityError:
                 print('[Error] Record already exists')
 
-    def get_items(self):
+    def get_items(self, type_ = ""):
         data_items = {}
-        cursor.execute("""SELECT id, name, path, type FROM wallpapers""")
+        if type_:
+            cursor.execute(f"""SELECT id, name, path, type FROM wallpapers WHERE type={type_}""")
+        else:
+            cursor.execute("""SELECT id, name, path, type FROM wallpapers""")
         for row in cursor:
             # row[0] returns the first column in the query
             data_items[row[0]] = [row[1],row[2],row[3]]
