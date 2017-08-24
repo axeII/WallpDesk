@@ -20,7 +20,7 @@ class Editor(wall.Paper):
         self.set_timer()
         self.scheduler = sched.scheduler(time.time, time.sleep)
         self.directory = dir_with_imgs
-        self.db = database.DB_lite()
+        self.db = database.DB_lite("./")
         self.km = analyzer.Kmeans()
         super().__init__(self,dir_with_imgs)
 

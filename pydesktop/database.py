@@ -9,7 +9,7 @@ import subprocess
 
 class DB_lite:
 
-    def __init__(self,path_to_db = "./"):
+    def __init__(self,path_to_db = "~/Library/Application Support/Pydesktop/"):
         try:
             self.db = sqlite3.connect(f"{path_to_db}pydesktop.db")
         except Exception:
