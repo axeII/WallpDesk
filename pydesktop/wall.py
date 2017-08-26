@@ -9,13 +9,13 @@ import subprocess
 
 class Paper:
 
-    def __init__(self,directory):
+    def __init__(self, directory):
         self.img_files = []
         self.directory = directory
         self.types = (".jpg",".png",".jpeg",".tiff")
 
     def set_wallpaper(self,img):
-        db_file = "~/Library/Application Support/Dock/desktoppicture.db"
+        db_file = os.path.expanduser('~') + "/Library/Application Support/Dock/desktoppicture.db"
         subprocess.call(["sqlite3", db_file, f"update data set value = '{img}'"])
         subprocess.call(["killall", "Dock"])
 
@@ -35,14 +35,17 @@ class Paper:
 
         for file_ in os.listdir(path):
             subprocess.call(["mv", os.path.abspath(file_), "~/.Trash/"])
-        subprocess.call(["mv", os.path.abspath(img), path])
+        subprocess.call(["cp", os.path.abspath(img), path])
 
     def get_current_wallpaper(self):
        pass
 
     def get_images_files(self):
-        if self.directory:
+        self.img_files = []
+        if self.directory and os.path.isdir(self.directory):
             for img_file in os.listdir(self.directory):
-                if img_file.splitext[1] in self.types:
+                if os.path.splitext(img_file)[1] in self.types and img_file not in self.img_files:
                     self.img_files.append(img_file)
+        else:
+            print(f"{self.directory} folder not found")
 

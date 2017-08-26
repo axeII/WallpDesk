@@ -22,16 +22,17 @@ class Editor(wall.Paper):
         self.directory = dir_with_imgs
         self.db = database.DB_lite("./")
         self.km = analyzer.Kmeans()
-        super().__init__(self,dir_with_imgs)
 
+        super().__init__(dir_with_imgs)
         super().get_images_files()
+
+        #warning this loop can take time
         for img in self.img_files:
             data = {
                 "name" : os.path.basename(img),
                 "path" : os.path.dirname(img),
                 "type" : km.check_image_color(img),
             }
-            #warning this loop can take time
             self.db.new_item(data)
 
     def set_timer(self, seconds = 3600):
