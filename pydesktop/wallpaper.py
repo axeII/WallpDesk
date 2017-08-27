@@ -7,21 +7,19 @@ __author__ = 'ales lerch'
 import os
 import wall
 import time
-import sched
 import random
 import analyzer
 import database
 import datetime
+import threading
 
 class Editor(wall.Paper):
 
     def __init__(self,dir_with_imgs):
         """modules, load image to database by name,path,type as dict/obj"""
         self.set_timer()
-        self.scheduler = sched.scheduler(time.time, time.sleep)
         self.directory = dir_with_imgs
         self.db = database.DB_lite("./")
-        self.km = analyzer.Kmeans()
 
         super().__init__(dir_with_imgs)
         super().get_images_files()
@@ -31,7 +29,7 @@ class Editor(wall.Paper):
             data = {
                 "name" : os.path.basename(img),
                 "path" : os.path.dirname(img),
-                "type" : km.check_image_color(img),
+                "type" : analyzer.check_image_color(img),
             }
             self.db.new_item(data)
 
@@ -57,5 +55,8 @@ class Editor(wall.Paper):
         super().set_wallpaper(f"{image[1]}/{image[2]}")
 
     def run(self):
-            self.scheduler.enter(self.time, 1, self.choose_random_image())
-            self.scheduler.run()
+
+        def action():
+            threading.Timer(self.time, action).start()
+            self.choose_random_image()
+        action()

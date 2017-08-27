@@ -4,36 +4,32 @@ from PIL import Image
 
 def check_image_color(image):
     """Returns string containing 'ligh' or 'dark' that tells 
-    if image is for day or night"""
+    if image is for day or night, Y - converting to gray to detect if 
+    it's really dark or light"""
 
     if not os.path.isfile(image):
         return "Image not found"
 
-    img = Image.open(image)
-    width, height = img.size
-    imgl = img.load()
-    rgb_im = img.convert('RGB')
-    R = G = B = 0
+    im = Image.open(image)
+    width, height = im.size
+    img = im.load()
+    rgb_im = im.convert('RGB')
+    R = 0
+    G = 0
+    B = 0
 
-    if image.endswith(".jpg"):
-        for w in range(0, width):
-            for h in range(0, height):
-                r, g, b = imgl[w,h]
-                R += r
-                G += g
-                B += b
-
-    elif image.endswith(".png"):
-        for w in range(0, width):
-            for h in range(0, height):
+    for w in range(0, width):
+        for h in range(0, height):
+            if image.endswith(".jpg"):
+                r, g, b = img[w,h]
+            elif image.endswith(".png"):
                 r, g, b = rgb_im.getpixel((w, h))
-                R += r
-                G += g
-                B += b
+            R += r
+            G += g
+            B += b
 
-    # converting to gray to detect if it's really dark or light
     Y = (0.299*R+0.587*G+0.114*B)/(width*height)
-    ################only for DEBUGING ############################
+    """ only for debuging
     if False:
         i = R/(width*height)
         j = G/(width*height)
@@ -42,12 +38,8 @@ def check_image_color(image):
         image.show()
         image = Image.new("RGB", (200, 200), (int(i),int(j),int(k)))
         image.show()
-    ##############################################################
-    if Y < 100:
-        return('dark')
-    else:
-        return('light')
-
+    """
+    return "dark" if Y < 100 else "light"
 
 if __name__ == "__main__":
     print(check_image_color("sample.png"))
