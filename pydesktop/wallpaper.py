@@ -20,11 +20,13 @@ class Editor(wall.Paper):
         self.set_timer()
         self.directory = dir_with_imgs
         self.db = database.DB_lite("./")
-
         super().__init__(dir_with_imgs)
-        super().get_images_files()
 
-        #warning this loop can take time
+        self.load_thread = threading.Thread(target=self.load_img_database)
+        #self.load_thread.start()
+
+    def load_img_database(self):
+        super().get_images_files()
         for img in self.img_files:
             data = {
                 "name" : os.path.basename(img),
@@ -53,9 +55,10 @@ class Editor(wall.Paper):
         else:
             theme = "light"
 
-        images = self.db.get_items( type_ = theme)
-        image = images[random.choice(images.keys())]
-        super().set_wallpaper(f"{image[1]}/{image[2]}")
+        if not sef.load_thread.isAlive():
+            images = self.db.get_items( type_ = theme)
+            image = images[random.choice(images.keys())]
+            super().set_wallpaper(f"{image[1]}/{image[2]}")
 
     def run(self):
 
