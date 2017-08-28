@@ -17,6 +17,7 @@ class Editor(wall.Paper):
 
     def __init__(self,dir_with_imgs):
         """modules, load image to database by name,path,type as dict/obj"""
+        self.run_ = False
         self.set_timer()
         self.directory = dir_with_imgs
         self.db = database.DB_lite("./")
@@ -63,8 +64,11 @@ class Editor(wall.Paper):
     def run(self):
 
         def action():
-            threading.Timer(self.time, action).start()
-            self.choose_random_image()
+            if self.run_:
+                threading.Timer(self.time, action).start()
+                self.choose_random_image()
+
         action()
+
 if __name__ == "__main__":
     e = Editor("./testimg")

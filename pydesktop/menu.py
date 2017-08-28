@@ -12,28 +12,35 @@ class Bar(rumps.App):
 
     def __init__(self):
         super(Bar, self).__init__("Some faking Awesome App")
-        self.menu = ["Desktop daemon On/Off", "Wallpaper", None
+        self.menu = ["Desktop daemon On/Off", "Wallpaper damon On/Off", None
                 ,"Next wallpaper", "Quit"]
         self.quit_button = None
         self.icon = "test.png"
         self.template = True
         self.title = None
 
-        self.editor = wallpaper.Editor("./testimg")
-        self.desktop = desktop.Daemon()
+        self.editor = wallpaper.Editor("./testimg").run()
+        self.desktop = desktop.Daemon().run()
 
     @rumps.clicked("Desktop daemon On/Off")
-    def on_off_test(self,_):
-        rumps.notification(title='Hi', subtitle='There.', message='Friend!', sound=does_something.sound, data=my_data)
-        print_button = self.menu["Desktop daemon On/Off"]
-        if print_button.callback is None:
-            print_button.set_callback(print_something)
+    def on_off_test(self, sender):
+        #rumps.notification(title='Hi', subtitle='There.', message='Friend!', sound=does_something.sound, data=my_data)
+        sender.state = not sender.state
+        if sender.state:
+            self.desktop.run_ = True
+            rumps.alert(message='You are now running desktop daemon', ok='OK')
         else:
-            print_button.set_callback(None)
+            self.desktop.run_ = False
 
-    @rumps.clicked("Wallpaper")
-    def wallpaper(self,_):
-        rumps.alert(message='something', ok='YES!', cancel='NO!')
+    @rumps.clicked("Wallpaper damon On/Off")
+    def wallpaper(self, sender):
+        sender.state = not sender.state
+        if sender.state:
+            rumps.alert(message='You are now running wallpaper daemon', ok='OK')
+            self.editor.run_ = True
+        else:
+            self.editor.run_ = False
+
 
     @rumps.clicked("Next wallpaper")
     def next_wallpaper(self,_):
@@ -45,5 +52,5 @@ class Bar(rumps.App):
         rumps.quit_application()
 
 if __name__ == "__main__":
-    #Bar().run()
+    Bar().run()
     pass

@@ -22,16 +22,18 @@ class Daemon(Paper):
 
     def __init__(self, delay = 5):
         super().__init__(f"{HOME}/Desktop/")
+        self.run_ = False
 
     def run(self):
 
         def action():
-            threading.Timer(9.0, action).start()
-            super(Daemon,self).get_images_files()
-            for file_ in self.img_files:
-                if file_.startswith('@'):
-                    o, t, c = self.lexer(file_)
-                    self.evaluate(o,t,c)
+            if self.run_:
+                threading.Timer(9.0, action).start()
+                super(Daemon,self).get_images_files()
+                for file_ in self.img_files:
+                    if file_.startswith('@'):
+                        o, t, c = self.lexer(file_)
+                        self.evaluate(o,t,c)
 
         action()
 
@@ -93,7 +95,7 @@ class Daemon(Paper):
 
         command_list = {
                 "pixiv": lambda n :
-                print(["mv","-n",f"{HOME}/Desktop/{n[0]}",
+                subprocess.call(["mv","-n",f"{HOME}/Desktop/{n[0]}",
                     f"{HOME}/Pictures/pix-girls/{n[1]}"]),
                 "girls": lambda n :
                 subprocess.call(["mv","-n",f"{HOME}/Desktop/{n[0]}",
