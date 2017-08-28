@@ -6,24 +6,22 @@ __author__ = 'ales lerch'
 
 import os
 import re
-import wall
 import time
 import shutil
 import threading
 import subprocess
 from enum import Enum
-
+from wall import Paper,HOME
 
 class Lexer_state(Enum):
     s = 1
     word = 2
     operation = 3
 
-class Daemon(wall.Paper):
+class Daemon(Paper):
 
     def __init__(self, delay = 5):
-        self.home = {os.path.expanduser('~')}
-        super().__init__(f"{os.path.expanduser('~')}/Desktop/")
+        super().__init__(f"{HOME}/Desktop/")
 
         def action():
             threading.Timer(9.0, action).start()
@@ -86,30 +84,30 @@ class Daemon(wall.Paper):
     def evaluate(self,original, file_name,commands):
 
         def desktop(org, file_):
-            subprocess.call(["mv", "-n", f"{os.path.expanduser('~')}/Desktop/{org}",f"{os.path.expanduser('~')}/Desktop/{file_}"])
+            subprocess.call(["mv", "-n", f"{HOME}/Desktop/{org}",f"{HOME}/Desktop/{file_}"])
             super(Daemon,self).set_wallpaper(
-                    f"{os.path.expanduser('~')}/Desktop/{file_}")
+                    f"{HOME}/Desktop/{file_}")
 
 
         command_list = {
                 "pixiv": lambda n :
-                subprocess.call(["mv","-n",f"{os.path.expanduser('~')}/Desktop/{n[0]}",
-                    f"{os.path.expanduser('~')}/Pictures/pix-girls/{n[1]}"]),
+                print(["mv","-n",f"{HOME}/Desktop/{n[0]}",
+                    f"{HOME}/Pictures/pix-girls/{n[1]}"]),
                 "girls": lambda n :
-                subprocess.call(["mv","-n",f"{os.path.expanduser('~')}/Desktop/{n[0]}",
-                    f"{os.path.expanduser('~')}/Pictures/Madchen/{n[1]}"]),
+                subprocess.call(["mv","-n",f"{HOME}/Desktop/{n[0]}",
+                    f"{HOME}/Pictures/Madchen/{n[1]}"]),
                 "img": lambda n :
-                subprocess.call(["mv","-n",f"{os.path.expanduser('~')}/Desktop/{n[0]}",
-                    f"{os.path.expanduser('~')}/Pictures/{n[1]}"]),
+                subprocess.call(["mv","-n",f"{HOME}/Desktop/{n[0]}",
+                    f"{HOME}/Pictures/{n[1]}"]),
                 "meme": lambda n : subprocess.call(["mv",
-                    "-n",f"{os.path.expanduser('~')}/Desktop/{n[0]}",
-                    f"{os.path.expanduser('~')}/Pictures/Meme/{n[1]}"]),
+                    "-n",f"{HOME}/Desktop/{n[0]}",
+                    f"{HOME}/Pictures/Meme/{n[1]}"]),
                 "daytime" : lambda n :
-                subprocess.call(["mv","-n",f"{os.path.expanduser('~')}/Desktop/{n[0]}",f"{os.path.expanduser('~')}/TimeDayWal/{n[1]}"]),
+                subprocess.call(["mv","-n",f"{HOME}/Desktop/{n[0]}",f"{HOME}/TimeDayWal/{n[1]}"]),
                 "mv" : lambda f, t :
-                subprocess.call(["mv","-n",f"{os.path.expanduser('~')}/Desktop/{f}",f"{os.path.abspath(t)}"]),
+                subprocess.call(["mv","-n",f"{HOME}/Desktop/{f}",f"{os.path.abspath(t)}"]),
                 "trash" : lambda n :
-                subprocess.call(["mv",f"{os.path.expanduser('~')}/Desktop/{n[0]}",f"{os.path.expanduser('~')}/.Trash/{n[1]}"]),
+                subprocess.call(["mv",f"{HOME}/Desktop/{n[0]}",f"{HOME}/.Trash/{n[1]}"]),
                 "wall" : lambda n : desktop(n[0], n[1]),
                 }
 

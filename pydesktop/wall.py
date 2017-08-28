@@ -7,6 +7,8 @@ __author__ = 'ales lerch'
 import os
 import subprocess
 
+HOME = os.getenv("HOME")
+
 class Paper:
 
     def __init__(self, directory):
