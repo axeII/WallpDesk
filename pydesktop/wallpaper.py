@@ -28,8 +28,8 @@ class Editor(wall.Paper):
         for img in self.img_files:
             data = {
                 "name" : os.path.basename(img),
-                "path" : os.path.dirname(img),
-                "type" : analyzer.check_image_color(img),
+                "path" : os.path.abspath(dir_with_imgs),
+                "type" : analyzer.check_image_color(f"{os.path.abspath(dir_with_imgs)}/{img}"),
             }
             self.db.new_item(data)
 
@@ -41,6 +41,9 @@ class Editor(wall.Paper):
         """set directory for choosing images to set as wallaper desktop,
         try to call backup direcotry if empty failed raise error"""
         self.directory = directory
+
+    def reset_library(self):
+        self.db.clean_table()
 
     def choose_random_image(self):
         """choose dark or light based on time but random"""
@@ -60,3 +63,5 @@ class Editor(wall.Paper):
             threading.Timer(self.time, action).start()
             self.choose_random_image()
         action()
+if __name__ == "__main__":
+    e = Editor("./testimg")

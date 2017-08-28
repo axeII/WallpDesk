@@ -28,13 +28,14 @@ class DB_lite:
             self.db.rollback()
             raise excpt
         finally:
-            self.db.close()
+            print("closing database")
+            #self.db.close()
 
     def new_item(self,data):
         if data:
             try:
-                self.cursor.execute("""INSERT INTO wallpapers(name, path, type)
-                                  VALUES({data["name"]},{data["path"]},{data["type"]})""")
+                self.cursor.execute(f"""INSERT INTO wallpapers(name, path, type)
+                                  VALUES("{data["name"]}","{data["path"]}","{data["type"]}")""")
                 self.db.commit()
             except sqlite3.IntegrityError:
                 print('[Error] Record already exists')
@@ -42,20 +43,20 @@ class DB_lite:
     def get_items(self, type_ = ""):
         data_items = {}
         if type_:
-            cursor.execute(f"""SELECT id, name, path, type FROM wallpapers WHERE type={type_}""")
+            self.cursor.execute(f"""SELECT id, name, path, type FROM wallpapers WHERE type='{type_}'""")
         else:
-            cursor.execute("""SELECT id, name, path, type FROM wallpapers""")
-        for row in cursor:
+            self.cursor.execute("""SELECT id, name, path, type FROM wallpapers""")
+        for row in self.cursor:
             # row[0] returns the first column in the query
             data_items[row[0]] = [row[1],row[2],row[3]]
         return data_items
 
     def get_one_item(self,which_one):
-        self.cursor.execute('''SELECT name, path, type FROM wallpapers WHERE name=?''', (which_one,))
+        self.cursor.execute("""SELECT name, path, type FROM wallpapers WHERE name=?""", (which_one,))
         return self.cursor.fetchone()
 
     def update_item_path(self,value, name):
-        self.cursor.execute('''UPDATE wallpapers SET path = ? WHERE name = ? ''',
+        self.cursor.execute("""UPDATE wallpapers SET path = ? WHERE name = ? """,
             (value, name))
         self.db.commit()
 
@@ -68,5 +69,16 @@ class DB_lite:
         self.cursor.execute("""DROP TABLE IF EXISTS wallpapers""")
         self.db.commit()
 
+    def clean_table(self):
+        self.cursor.execute("""DELETE FROM wallpapers""")
+        self.db.commit()
+
     def __exit__(self):
         self.db.close()
+
+if __name__ == "__main__":
+    h = DB_lite("./")
+    d = {"name": 'test01',"path": 'random/paht/', "type" : 'light'}
+    h.new_item(d)
+    print(h.get_items(type_ = "light"))
+    print(h.get_one_item("test01"))
