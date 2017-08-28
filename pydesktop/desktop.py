@@ -23,6 +23,8 @@ class Daemon(Paper):
     def __init__(self, delay = 5):
         super().__init__(f"{HOME}/Desktop/")
 
+    def run(self):
+
         def action():
             threading.Timer(9.0, action).start()
             super(Daemon,self).get_images_files()
