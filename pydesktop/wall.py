@@ -13,6 +13,7 @@ class Paper:
 
     def __init__(self, directory):
         self.img_files = []
+        self.interrupted = False
         self.directory = directory
         self.types = (".jpg",".png",".jpeg",".tiff")
 
