@@ -24,8 +24,7 @@ class Daemon(Paper):
     def __init__(self, delay = 5):
         super().__init__(f"{HOME}/Desktop/")
         self.que = Queue(maxsize = 1)
-        self.que.put(threading.Thread(target=self.loop)
-)
+        self.que.put(threading.Thread(target=self.loop))
 
     def run(self):
         if self.que.empty():
