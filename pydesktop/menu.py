@@ -67,12 +67,11 @@ class Bar(rumps.App):
 
     @rumps.clicked("Next wallpaper")
     def next_wallpaper(self,_):
-        print("setting next wallpar yeah")
         self.editor.choose_random_image()
 
     @rumps.clicked("Quit")
     def clean_up_before_quit(self,_):
-        print('execute clean up code')
+        print("Quit application")
         rumps.quit_application()
 
 if __name__ == "__main__":

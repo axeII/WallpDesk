@@ -31,9 +31,9 @@ class Editor(wall.Paper):
     def load_img_database(self):
         """ warning loading database can now only work 
         with thread safe database no ther thread can work with database"""
-        print("loading images...")
         super().get_images_files()
         if sorted(self.img_files) != sorted(self.db.get_names()):
+            print("loading images...")
             for img in self.img_files:
                 data = {
                     "name" : os.path.basename(img),
@@ -43,6 +43,7 @@ class Editor(wall.Paper):
                 }
                 self.db.new_item(data)
             print("all images loaded to databse")
+        print("Database with images set!")
 
     def set_timer(self, seconds = 3600):
         """ Based on time wallpaper can change"""
