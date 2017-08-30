@@ -1,18 +1,23 @@
 from setuptools import setup
 
-APP = ['example_class.py']
-DATA_FILES = []
-OPTIONS = {
-    'argv_emulation': True,
-    'plist': {
-        'LSUIElement': True,
-    },
-    'packages': ['rumps','Pillow'],
-}
+OPTIONS = { 'dist_dir' : 'dist',
+            'site_packages' : False,
+            'argv_emulation': False, # argv_emulation interferes with gui apps
+            'plist': {
+                    'LSUIElement': True,
+                },
+            #'iconfile' : 'resources/WallpDesk.icns',
+            'alias': False }
 
-setup(
-    app=APP,
-    data_files=DATA_FILES,
-    options={'py2app': OPTIONS},
-    setup_requires=['py2app'],
-)
+setup(name='WallpDesk',
+      app=['pydeskop/__main__.py'],
+      options={'py2app': OPTIONS},
+      version='0.1',
+      description='A simple os x menu bar application setting wallpapers',
+      author='Ales Lerch',
+      author_email='secret',
+      url='github.com/L3rchal/Wallpdesk',
+      python_requires=">=3.5",
+      test_suite="tests",
+      packages=['WallpDesk'],
+     )
