@@ -17,7 +17,6 @@ class Editor(wall.Paper):
 
     def __init__(self,dir_with_imgs):
         """modules, load image to database by name,path,type as dict/obj"""
-        self.run_ = False
         self.set_timer()
         self.directory = dir_with_imgs
         self.db = database.DB_lite("./")
@@ -56,19 +55,23 @@ class Editor(wall.Paper):
         else:
             theme = "light"
 
-        if not sef.load_thread.isAlive():
+        if not self.load_thread.isAlive():
             images = self.db.get_items( type_ = theme)
-            image = images[random.choice(images.keys())]
+            image = images[random.choice(list(images.keys()))]
             super().set_wallpaper(f"{image[1]}/{image[2]}")
 
     def run(self):
+        if self.que.empty():
+            self.que.put(threading.Thread(target=self.loop))
+        self.que.get().start()
 
-        def action():
-            if self.run_:
-                threading.Timer(self.time, action).start()
-                self.choose_random_image()
+    def loop(self):
+        while True:
+            time.sleep(10.0)
 
-        action()
+            if self.interrupted:
+                break
+            self.choose_random_image()
 
 if __name__ == "__main__":
     e = Editor("./testimg")
