@@ -11,6 +11,7 @@ import shutil
 import threading
 import subprocess
 from enum import Enum
+from queue import Queue
 from wall import Paper,HOME
 
 class Lexer_state(Enum):
@@ -22,20 +23,26 @@ class Daemon(Paper):
 
     def __init__(self, delay = 5):
         super().__init__(f"{HOME}/Desktop/")
-        self.run_ = False
+        self.que = Queue(maxsize = 1)
+        self.que.put(threading.Thread(target=self.loop)
+)
 
     def run(self):
+        if self.que.empty():
+            self.que.put(threading.Thread(target=self.loop))
+        self.que.get().start()
 
-        def action():
-            if self.run_:
-                threading.Timer(9.0, action).start()
-                super(Daemon,self).get_images_files()
-                for file_ in self.img_files:
-                    if file_.startswith('@'):
-                        o, t, c = self.lexer(file_)
-                        self.evaluate(o,t,c)
+    def loop(self):
+        while True:
+            time.sleep(2.0)
+            if self.interrupted:
+                break
 
-        action()
+            super(Daemon,self).get_images_files()
+            for file_ in self.img_files:
+                if file_.startswith('@'):
+                    O, T, C = self.lexer(file_)
+                    self.evaluate(O, T, C)
 
     def lexer(self,text):
         """
