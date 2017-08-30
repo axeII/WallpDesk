@@ -19,7 +19,7 @@ class Editor(wall.Paper):
     def __init__(self,dir_with_imgs):
         """modules, load image to database by name,path,type as dict/obj"""
         self.set_timer()
-        self.db = database.DB_lite("./")
+        self.db = database.DB_lite()
         self.directory = dir_with_imgs
         self.que = Queue(maxsize = 1)
         self.que.put(threading.Thread(target=self.loop))

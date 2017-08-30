@@ -6,10 +6,11 @@ __author__ = 'ales lerch'
 
 import sqlite3
 import subprocess
+from wall import HOME
 
 class DB_lite:
 
-    def __init__(self,path_to_db = "~/Library/Application Support/Pydesktop/"):
+    def __init__(self,path_to_db = f"{HOME}/Library/Application Support/WallpDesk/"):
         try:
             self.db = sqlite3.connect(f"{path_to_db}pydesktop.db", check_same_thread=False)
         except Exception:
@@ -83,7 +84,7 @@ class DB_lite:
         self.db.close()
 
 if __name__ == "__main__":
-    h = DB_lite("./")
+    h = DB_lite()
     d = {"name": 'test01',"path": 'random/paht/', "type" : 'light'}
     h.new_item(d)
     print(h.get_items(type_ = "light"))
