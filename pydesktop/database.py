@@ -11,11 +11,11 @@ class DB_lite:
 
     def __init__(self,path_to_db = "~/Library/Application Support/Pydesktop/"):
         try:
-            self.db = sqlite3.connect(f"{path_to_db}pydesktop.db")
+            self.db = sqlite3.connect(f"{path_to_db}pydesktop.db", check_same_thread=False)
         except Exception:
             print("[Error] Database not found creating database")
             subprocess.call(["touch", f"{path_to_db}pydesktop.db"])
-            self.db = sqlite3.connect(f"{path_to_db}pydesktop.db")
+            self.db = sqlite3.connect(f"{path_to_db}pydesktop.db", check_same_thread=False)
 
         try:
             self.cursor = self.db.cursor()
@@ -26,10 +26,9 @@ class DB_lite:
             self.db.commit()
         except Exception as excpt:
             self.db.rollback()
-            raise excpt
-        finally:
             print("closing database")
-            #self.db.close()
+            self.db.close()
+            raise excpt
 
     def new_item(self,data):
         if data:
@@ -43,13 +42,20 @@ class DB_lite:
     def get_items(self, type_ = ""):
         data_items = {}
         if type_:
-            self.cursor.execute(f"""SELECT id, name, path, type FROM wallpapers WHERE type='{type_}'""")
+            self.cursor.execute("""SELECT * FROM wallpapers WHERE type=? """,(type_,))
         else:
             self.cursor.execute("""SELECT id, name, path, type FROM wallpapers""")
         for row in self.cursor:
             # row[0] returns the first column in the query
             data_items[row[0]] = [row[1],row[2],row[3]]
         return data_items
+
+    def get_names(self):
+        ret = []
+        self.cursor.execute("""SELECT id, name, path, type FROM wallpapers""")
+        for row in self.cursor:
+            ret.append(row[1])
+        return ret
 
     def get_one_item(self,which_one):
         self.cursor.execute("""SELECT name, path, type FROM wallpapers WHERE name=?""", (which_one,))
@@ -65,11 +71,11 @@ class DB_lite:
             (item_name))
         self.db.commit()
 
-    def reset_db(self):
+    def delete_table(self):
         self.cursor.execute("""DROP TABLE IF EXISTS wallpapers""")
         self.db.commit()
 
-    def clean_table(self):
+    def reset_table(self):
         self.cursor.execute("""DELETE FROM wallpapers""")
         self.db.commit()
 
@@ -82,3 +88,4 @@ if __name__ == "__main__":
     h.new_item(d)
     print(h.get_items(type_ = "light"))
     print(h.get_one_item("test01"))
+    h.reset_table()
