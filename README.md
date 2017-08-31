@@ -1,4 +1,5 @@
 # WallpDesk
+[![Build Status](https://travis-ci.org/L3rchal/WallpDesk.svg?branch=master)](https://travis-ci.org/L3rchal/WallpDesk)
 
 `WallpDesk` is simple lightweight os x application that only displays in menu bar. Application creates two daemons for setting wallpaper and controlling deskop files. Both are controlled with menu bar settings.
 
