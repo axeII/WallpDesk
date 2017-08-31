@@ -1,10 +1,15 @@
+language: python
+python:
+  - 3.5
+  - 3.6
+
 matrix:
  - os: osx
-    language: generic
-    env: PYTHON=3.5.1
+   language: generic
+   env: PYTHON=3.5
  - os: osx
-    language: generic
-    env: PYTHON=3.6.1
+   language: generic
+   env: PYTHON=3.6
 
 before install:
   if [ "$TRAVIS_OS_NAME" == "osx" ]; then
@@ -21,10 +26,12 @@ before install:
   fi
 
 install:
-    - python -m easy_install -U setuptools
-    - pip install rumps
-    - pip install Pillow
+ - pip install --upgrade setuptools
+   #- pip install pystan
+   # - python setup.py install
+ - pip install Pillow
+   # - pip install rumps
 
 script:
-    - python setup.py test
+ - python setup.py test
 

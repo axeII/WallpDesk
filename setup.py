@@ -21,5 +21,5 @@ setup(name='WallpDesk',
       python_requires=">=3.5",
       setup_requires=['py2app','rumps','Pillow'],
       test_suite="tests",
-      packages=['WallpDesk'],
+#      packages=['WallpDesk'],
      )
