@@ -6,7 +6,7 @@ OPTIONS = { 'dist_dir' : 'dist',
             'plist': {
                     'LSUIElement': True,
                 },
-            #'iconfile' : 'resources/WallpDesk.icns',
+            'iconfile' : 'images/wallpdesk.icns',
             'alias': False }
 
 setup(name='WallpDesk',
