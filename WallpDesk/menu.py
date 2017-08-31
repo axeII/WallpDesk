@@ -22,8 +22,8 @@ class Bar(rumps.App):
         self.quit_button = None
         self.template = True
         self.title = None
-        if isfile("./menu_bar.png"):
-            self.icon = "menu_bar.png"
+        if isfile("images/menu_bar.png"):
+            self.icon = "images/menu_bar.png"
         else:
             self.title = "Icon not found"
 
