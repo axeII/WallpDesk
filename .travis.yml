@@ -1,7 +1,13 @@
 language: python
+os: osx
+
 python:
     - "3.5"
     - "3.6"
+
+install:
+    - pip install rumps
+    - pip install Pillow
 
 script:
     - python setup.py test
