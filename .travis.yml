@@ -5,9 +5,12 @@ python:
     - "3.5"
     - "3.6"
 
+before install:
+    - brew install python3
+
 install:
-    - pip install rumps
-    - pip install Pillow
+    - pip3 install rumps
+    - pip3 install Pillow
 
 script:
     - python setup.py test
