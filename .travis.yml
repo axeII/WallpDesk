@@ -3,5 +3,12 @@ python:
     - "3.5"
     - "3.6"
 
+before_install:
+    - sudo apt-get -qq update
+
+install:
+    - pip install rumps
+    - pip install Pillow
+
 script:
     - python setup.py test
