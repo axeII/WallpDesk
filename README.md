@@ -2,7 +2,7 @@
 
 `WallpDesk` is simple lightweight os x application that only displays in menu bar. Application creates two daemons for setting wallpaper and controlling deskop files. Both are controlled with menu bar settings.
 
-![screen](http://i.imgur.com/menubar.png)
+![screen](http://imgur.com/qnePBk0.png)
 
 Application doesn't have so far any gui so only control is via menu bar. Whole application is written in python3 using two external libraries and sqlite3.
 
@@ -29,4 +29,4 @@ Application works that first creates database and inputs images path and type (l
 
 
 ## Credits
-- App icon made by ![Dimi Kazak](https://www.flaticon.com/authors/dimi-kazak)
+- App icon made by [Dimi Kazak](https://www.flaticon.com/authors/dimi-kazak)
