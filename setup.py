@@ -19,7 +19,7 @@ setup(name='WallpDesk',
       url='github.com/L3rchal/Wallpdesk',
       data_files = [('', ['images'])],
       python_requires=">=3.5",
-      setup_requires=['py2app','rumps','Pillow'],
+#      setup_requires=['py2app','rumps','Pillow'],
       test_suite="tests",
 #      packages=['WallpDesk'],
      )
