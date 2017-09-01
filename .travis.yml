@@ -26,9 +26,7 @@ before install:
   fi
 
 install:
- - pip install --upgrade setuptools
-   #- pip install pystan
-   # - python setup.py install
+ - python -m easy_install -U setuptools
  - pip install Pillow
    # - pip install rumps
 

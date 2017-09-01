@@ -17,6 +17,9 @@ class Paper:
         self.directory = directory
         self.types = (".jpg",".png",".jpeg",".tiff")
 
+    def set_directory(self, directory):
+        self.directory = directory
+
     def set_wallpaper(self,img):
         db_file = os.path.expanduser('~') + "/Library/Application Support/Dock/desktoppicture.db"
         subprocess.call(["sqlite3", db_file, f"update data set value = '{img}'"])
