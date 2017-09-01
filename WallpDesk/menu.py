@@ -17,7 +17,7 @@ class Bar(rumps.App):
     def __init__(self):
         super(Bar, self).__init__("WallpDesk")
         self.menu = ["About","Settings", None,
-                "Desktop daemon", "Wallpaper damon", None
+                "Desktop daemon", "Wallpaper daemon", None
                 ,"Next wallpaper", "Quit"]
         #self.def_desktop = f"{HOME}/Desktop/" should be always desktop duh
         self.def_wallpaper = f"{HOME}/TimeDayWall/"
@@ -36,7 +36,9 @@ class Bar(rumps.App):
 
     @rumps.clicked("About")
     def about(self, _):
-        pass
+        rumps.Window(message="\t   WallpDesk (0.0.2)", title="\tAbout WallpDesk",
+                default_text="""\n\tVersion: 0.0.2\n\n\tLicence: MIT\n\n\tAuthor: Ales Lerch""",
+            dimensions=(170, 130)).run()
 
     @rumps.clicked("Settings")
     def settings(self, _):
@@ -59,7 +61,7 @@ class Bar(rumps.App):
         else:
             self.desktop.interrupted = True
 
-    @rumps.clicked("Wallpaper damon")
+    @rumps.clicked("Wallpaper daemon")
     def wallpaper(self, sender):
         sender.state = not sender.state
         if sender.state:
@@ -78,5 +80,3 @@ class Bar(rumps.App):
         print("Quit application")
         rumps.quit_application()
 
-if __name__ == "__main__":
-    Bar().run()
