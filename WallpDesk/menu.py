@@ -7,16 +7,14 @@ __author__ = 'ales lerch'
 import rumps
 import desktop
 import wallpaper
-import tkinter as tk
 from wall import HOME
 from os.path import isfile
-from tkinter import filedialog
 
 class Bar(rumps.App):
 
     def __init__(self):
         super(Bar, self).__init__("WallpDesk")
-        self.menu = ["About","Settings", None,
+        self.menu = ["About","Settings","Reset database", None,
                 "Desktop daemon", "Wallpaper daemon", None
                 ,"Next wallpaper", "Quit"]
         #self.def_desktop = f"{HOME}/Desktop/" should be always desktop duh
@@ -29,8 +27,6 @@ class Bar(rumps.App):
         else:
             self.title = "Icon not found"
 
-        self.root = tk.Tk()
-        self.root.withdraw()
         self.editor = wallpaper.Editor(self.def_wallpaper)
         self.desktop = desktop.Daemon()
 
@@ -40,12 +36,20 @@ class Bar(rumps.App):
                 default_text="""\n\tVersion: 0.0.2\n\n\tLicence: MIT\n\n\tAuthor: Ales Lerch""",
             dimensions=(170, 130)).run()
 
+    @rumps.clicked("Reset database")
+    def reset_db(self, _):
+        self.editor.reset_library()
+
     @rumps.clicked("Settings")
     def settings(self, _):
-        file_path = filedialog.askdirectory()
-        if self.def_wallpaper != file_path:
-            self.def_wallpaper = file_path
-            print(self.def_wallpaper)
+        #file_path = filedialog.askdirectory() NSError
+        file_path = rumps.Window(message="Set wallpaper path", title='Path',
+                default_text=self.def_wallpaper,
+                ok="Ok", cancel="Cancel",
+                dimensions=(320, 120)).run()
+        if self.def_wallpaper != file_path.text:
+            print(file_path)
+            self.def_wallpaper = file_path.text
             self.editor.set_loading_dir(self.def_wallpaper)
 
     @rumps.clicked("Desktop daemon")
@@ -80,3 +84,5 @@ class Bar(rumps.App):
         print("Quit application")
         rumps.quit_application()
 
+if __name__ == "__main__":
+    Bar().run()
