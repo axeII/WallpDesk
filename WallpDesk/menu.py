@@ -7,8 +7,10 @@ __author__ = 'ales lerch'
 import rumps
 import desktop
 import wallpaper
+import tkinter as tk
 from wall import HOME
 from os.path import isfile
+from tkinter import filedialog
 
 class Bar(rumps.App):
 
@@ -27,20 +29,22 @@ class Bar(rumps.App):
         else:
             self.title = "Icon not found"
 
+        self.root = tk.Tk()
+        self.root.withdraw()
         self.editor = wallpaper.Editor(self.def_wallpaper)
         self.desktop = desktop.Daemon()
 
     @rumps.clicked("About")
     def about(self, _):
-        rumps.alert(message="Pydeskop lightway application for settings desktop")
+        pass
 
     @rumps.clicked("Settings")
     def settings(self, _):
-        res = rumps.Window(message="Set wallpaper path", title='Path',
-                default_text=self.def_wallpaper,
-                ok="Ok", cancel="Cancel",
-                dimensions=(320, 120)).run()
-        self.def_wallpaper = res.text
+        file_path = filedialog.askdirectory()
+        if self.def_wallpaper != file_path:
+            self.def_wallpaper = file_path
+            print(self.def_wallpaper)
+            self.editor.set_loading_dir(self.def_wallpaper)
 
     @rumps.clicked("Desktop daemon")
     def on_off_test(self, sender):
