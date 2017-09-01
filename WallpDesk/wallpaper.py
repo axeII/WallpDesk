@@ -71,7 +71,10 @@ class Editor(wall.Paper):
         print("Synced with database")
 
     def reset_library(self):
-        self.db.clean_table()
+        self.db.reset_table()
+        if not self.load_thread.isAlive():
+            print('starting thread')
+            threading.Thread(target=self.load_img_database).start()
 
     def choose_random_image(self):
         """choose dark or light based on time but random"""
