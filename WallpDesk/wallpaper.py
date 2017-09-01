@@ -28,6 +28,12 @@ class Editor(wall.Paper):
         self.load_thread = threading.Thread(target=self.load_img_database)
         self.load_thread.start()
 
+    def set_loading_dir(self, dir_):
+        if not self.load_thread.isAlive():
+            print('starting thread')
+            self.set_directory(dir_)
+            threading.Thread(target=self.load_img_database).start()
+
     def load_img_database(self):
         """ warning loading database can now only work 
         with thread safe database no ther thread can work with database"""
@@ -54,11 +60,22 @@ class Editor(wall.Paper):
         try to call backup direcotry if empty failed raise error"""
         self.directory = directory
 
+    def sync_with_db(self):
+        for local_file in os.listdir(self.directory):
+            if local_file not in self.img_files:
+                self.img_files.append(local_file)
+
+        for db_file in self.db.get_names():
+            if db_file not in os.listdir(self.directory):
+                self.db.del_item(db_file)
+        print("Synced with database")
+
     def reset_library(self):
         self.db.clean_table()
 
     def choose_random_image(self):
         """choose dark or light based on time but random"""
+        self.sync_with_db()
         hour = datetime.datetime.today().hour
         if hour >= 20 or (hour >= 0 and hour < 8):
             theme = "dark"
