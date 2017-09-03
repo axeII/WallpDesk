@@ -16,22 +16,25 @@ from queue import Queue
 
 class Editor(wall.Paper):
 
-    def __init__(self,dir_with_imgs):
+    def __init__(self):
         """modules, load image to database by name,path,type as dict/obj"""
         self.set_timer()
         self.db = database.DB_lite()
-        self.directory = dir_with_imgs
-        self.que = Queue(maxsize = 1)
-        self.que.put(threading.Thread(target=self.loop))
-        super().__init__(dir_with_imgs)
+        self.run_queue = Queue(maxsize = 1)
+        self.collect_queue = Queue(maxsize = 1)
+        self.run_queue.put(threading.Thread(target=self.loop))
 
-        self.load_thread = threading.Thread(target=self.load_img_database)
-        self.load_thread.start()
+        check_path = self.db.get_wall_path()
+        super().__init__(check_path)
+        if check_path:
+            self.collect_queue.put(True)
+            threading.Thread(target=self.load_img_database).start()
 
     def set_loading_dir(self, dir_):
-        if not self.load_thread.isAlive():
-            print('starting thread')
+        if self.collect_queue.empty():
+            print("starting new collect thread")
             self.set_directory(dir_)
+            self.collect_queue.put(True)
             threading.Thread(target=self.load_img_database).start()
 
     def load_img_database(self):
@@ -49,6 +52,10 @@ class Editor(wall.Paper):
                 }
                 self.db.new_item(data)
             print("all images loaded to databse")
+        try:
+            self.collect_queue.get()
+        except:
+            print("Ups cant get collect queue")
         print("Database with images set!")
 
     def set_timer(self, seconds = 3600):
@@ -72,8 +79,9 @@ class Editor(wall.Paper):
 
     def reset_library(self):
         self.db.reset_table()
-        if not self.load_thread.isAlive():
-            print('starting thread')
+        if self.collect_queue.empty():
+            print("starting thread to reset lb")
+            self.collect_queue.put(True)
             threading.Thread(target=self.load_img_database).start()
 
     def choose_random_image(self):
@@ -85,15 +93,15 @@ class Editor(wall.Paper):
         else:
             theme = "light"
 
-        if not self.load_thread.isAlive():
+        if self.collect_queue.empty():
             images = self.db.get_items(type_ = theme)
             image = images[random.choice(list(images.keys()))]
             super().set_wallpaper(f"{image[1]}/{image[0]}")
 
     def run(self):
-        if self.que.empty():
-            self.que.put(threading.Thread(target=self.loop))
-        self.que.get().start()
+        if self.run_queue.empty():
+            self.run_queue.put(threading.Thread(target=self.loop))
+        self.run_queue.get().start()
 
     def loop(self):
         while True:
@@ -103,4 +111,4 @@ class Editor(wall.Paper):
             self.choose_random_image()
 
 if __name__ == "__main__":
-    e = Editor("./testimg")
+    e = Editor()
