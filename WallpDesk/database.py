@@ -6,7 +6,10 @@ __author__ = 'ales lerch'
 
 import sqlite3
 import subprocess
-from wall import HOME
+try:
+    from wall import HOME
+except ModuleNotFoundError:
+    from .wall import HOME
 
 class DB_lite:
 

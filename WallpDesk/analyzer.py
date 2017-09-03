@@ -21,7 +21,7 @@ def check_image_color(image):
     try:
         for w in range(0, width):
             for h in range(0, height):
-                if image.endswith(".jpg"):
+                if image.endswith(".jpg") or image.endswith(".jpeg"):
                         r, g, b = img[w,h]
                 elif image.endswith(".png"):
                     r, g, b = rgb_im.getpixel((w, h))
@@ -43,6 +43,3 @@ def check_image_color(image):
         image.show()
     """
     return "dark" if Y < 100 else "light"
-
-if __name__ == "__main__":
-    print(check_image_color("sample.png"))

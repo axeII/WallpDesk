@@ -110,5 +110,3 @@ class Editor(wall.Paper):
                 break
             self.choose_random_image()
 
-if __name__ == "__main__":
-    e = Editor()

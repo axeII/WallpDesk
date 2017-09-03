@@ -136,6 +136,3 @@ class Daemon(Paper):
         except KeyError:
             pass
 
-if __name__ == "__main__":
-    d = Daemon()
-
