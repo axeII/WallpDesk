@@ -18,15 +18,18 @@ def check_image_color(image):
     G = 0
     B = 0
 
-    for w in range(0, width):
-        for h in range(0, height):
-            if image.endswith(".jpg"):
-                r, g, b = img[w,h]
-            elif image.endswith(".png"):
-                r, g, b = rgb_im.getpixel((w, h))
-            R += r
-            G += g
-            B += b
+    try:
+        for w in range(0, width):
+            for h in range(0, height):
+                if image.endswith(".jpg"):
+                        r, g, b = img[w,h]
+                elif image.endswith(".png"):
+                    r, g, b = rgb_im.getpixel((w, h))
+                R += r
+                G += g
+                B += b
+    except:
+        return "Unknown format"
 
     Y = (0.299*R+0.587*G+0.114*B)/(width*height)
     """ only for debuging
