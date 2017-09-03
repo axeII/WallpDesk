@@ -24,6 +24,9 @@ class DB_lite:
                 CREATE TABLE IF NOT EXISTS wallpapers(id INTEGER PRIMARY KEY, name TEXT uniuqe,
                                    path TEXT, type TEXT)
             """)
+            self.cursor.execute("""
+                CREATE TABLE IF NOT EXISTS settings(id INTEGER PRIMARY KEY, set_path TEXT)
+            """)
             self.db.commit()
         except Exception as excpt:
             self.db.rollback()
@@ -39,6 +42,17 @@ class DB_lite:
                 self.db.commit()
             except sqlite3.IntegrityError:
                 print('[Error] Record already exists')
+
+    def set_wall_path(self,in_path):
+        self.cursor.execute(f"""INSERT INTO settings(set_path) VALUES("{in_path}") """)
+        self.db.commit()
+
+    def get_wall_path(self):
+        self.cursor.execute("""SELECT * FROM settings WHERE id=1""")
+        try:
+            return self.cursor.fetchone()[1]
+        except:
+            return None
 
     def get_items(self, type_ = ""):
         data_items = {}
@@ -77,6 +91,7 @@ class DB_lite:
 
     def reset_table(self):
         self.cursor.execute("""DELETE FROM wallpapers""")
+        self.cursor.execute("""DELETE FROM settings""")
         self.db.commit()
 
     def __exit__(self):
@@ -88,4 +103,6 @@ if __name__ == "__main__":
     h.new_item(d)
     print(h.get_items(type_ = "light"))
     print(h.get_one_item("test01"))
+    #h.set_wall_path(f"{HOME}/WallTimeDay")
+    print(h.get_wall_path())
     h.reset_table()
