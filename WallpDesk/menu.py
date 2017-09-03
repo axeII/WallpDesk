@@ -33,8 +33,8 @@ class Bar(rumps.App):
 
     @rumps.clicked("About")
     def about(self, _):
-        rumps.Window(message="\t   WallpDesk (0.0.2)", title="\tAbout WallpDesk",
-                default_text="""\n\tVersion: 0.0.2\n\n\tLicence: MIT\n\n\tAuthor: Ales Lerch""",
+        rumps.Window(message="\t   WallpDesk (0.0.4)", title="\tAbout WallpDesk",
+                default_text="""\n\tVersion: 0.0.4\n\n\tLicence: MIT\n\n\tAuthor: Ales Lerch""",
             dimensions=(170, 130)).run()
 
     @rumps.clicked("Reset database")

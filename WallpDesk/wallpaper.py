@@ -44,12 +44,15 @@ class Editor(wall.Paper):
         if sorted(self.img_files) != sorted(self.db.get_names()):
             print("loading images...")
             for img in self.img_files:
+                if img in self.db.get_names():
+                    continue
                 data = {
                     "name" : os.path.basename(img),
                     "path" : os.path.abspath(self.directory),
                     "type" : analyzer.check_image_color(
                         f"{os.path.abspath(self.directory)}/{img}"),
                 }
+                print(f"ading: {img}")
                 self.db.new_item(data)
             print("all images loaded to databse")
         try:
