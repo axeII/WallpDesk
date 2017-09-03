@@ -9,16 +9,17 @@ import desktop
 import wallpaper
 from wall import HOME
 from os.path import isfile
+from database import DB_lite
 
 class Bar(rumps.App):
 
     def __init__(self):
-        super(Bar, self).__init__("WallpDesk")
+        super().__init__("WallpDesk")
         self.menu = ["About","Settings","Reset database", None,
                 "Desktop daemon", "Wallpaper daemon", None
                 ,"Next wallpaper", "Quit"]
-        #self.def_desktop = f"{HOME}/Desktop/" should be always desktop duh
-        self.def_wallpaper = f"{HOME}/TimeDayWall/"
+        self.db = DB_lite()
+        self.def_wallpaper = self.db.get_wall_path()
         self.quit_button = None
         self.template = True
         self.title = None
@@ -27,7 +28,7 @@ class Bar(rumps.App):
         else:
             self.title = "Icon not found"
 
-        self.editor = wallpaper.Editor(self.def_wallpaper)
+        self.editor = wallpaper.Editor()
         self.desktop = desktop.Daemon()
 
     @rumps.clicked("About")
@@ -43,14 +44,16 @@ class Bar(rumps.App):
     @rumps.clicked("Settings")
     def settings(self, _):
         #file_path = filedialog.askdirectory() NSError
-        file_path = rumps.Window(message="Set wallpaper path", title='Path',
+        file_path = rumps.Window(message="Set wallpaper absolute path", title='Path',
                 default_text=self.def_wallpaper,
                 ok="Ok", cancel="Cancel",
                 dimensions=(320, 120)).run()
         if self.def_wallpaper != file_path.text:
-            print(file_path)
-            self.def_wallpaper = file_path.text
-            self.editor.set_loading_dir(self.def_wallpaper)
+            print(file_path.text)
+            if file_path.text != "None":
+                self.def_wallpaper = file_path.text
+                self.db.set_wall_path(file_path.text)
+                self.editor.set_loading_dir(self.def_wallpaper)
 
     @rumps.clicked("Desktop daemon")
     def on_off_test(self, sender):
@@ -67,13 +70,17 @@ class Bar(rumps.App):
 
     @rumps.clicked("Wallpaper daemon")
     def wallpaper(self, sender):
-        sender.state = not sender.state
-        if sender.state:
-            rumps.alert(message='You are now running wallpaper daemon', ok='OK')
-            self.editor.interrupted = False
-            self.editor.run()
+        if self.def_wallpaper:
+            sender.state = not sender.state
+            if sender.state:
+                rumps.alert(message='You are now running wallpaper daemon', ok='OK')
+                print(self.def_wallpaper)
+                self.editor.interrupted = False
+                self.editor.run()
+            else:
+                self.editor.interrupted = True
         else:
-            self.editor.interrupted = True
+            rumps.alert("No input path for images set!")
 
     @rumps.clicked("Next wallpaper")
     def next_wallpaper(self,_):
