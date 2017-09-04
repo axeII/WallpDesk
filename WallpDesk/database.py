@@ -48,7 +48,7 @@ class DB_lite:
                 print('[Error] Record already exists')
 
     def set_wall_path(self,in_path):
-        self.cursor.execute(f"""UPDATE settings SET set_path to {in_path} where id=1 """)
+        self.cursor.execute(f"""UPDATE settings SET set_path = "{in_path}" where id=1 """)
         self.db.commit()
 
     def get_wall_path(self):
