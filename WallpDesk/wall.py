@@ -27,20 +27,21 @@ class Paper:
 
     def set_wallpaper_with_effect(self, img):
         path = f"{HOME}/Library/Application Support/WallpDesk/current/"
-        cmd = """tell application "System Events"
-                 tell current desktop
-                 set picture rotation to 1 -- (0=off, 1=interval, 2=login, 3=sleep)
-                 set random order to true
-                 set pictures folder to file "Users:ales:Library:Application Support:current:"
-                 set change interval to 5.0
-                 end tell
-                end tell"""
+        cmd = b"""tell application "System Events"
+	tell current desktop
+		set picture rotation to 1 -- (0=off, 1=interval, 2=login, 3=sleep)
+		set random order to true
+		set pictures folder to alias "Macintosh HD:Users:ales:Library:Application Support:WallpDesk:current:"
+		set change interval to 5.0
+	end tell
+end tell"""
+        subprocess.call(["mkdir","-p", path])
         subprocess.Popen(["osascript", '-'],
                          stdin=subprocess.PIPE,
                          stdout=subprocess.PIPE).communicate(cmd)
 
         for file_ in os.listdir(path):
-            subprocess.call(["mv", os.path.abspath(file_), f"{HOME}/.Trash/"])
+            subprocess.call(["mv", f"{path}/{file_}", f"{HOME}/.Trash/"])
         subprocess.call(["cp", os.path.abspath(img), path])
 
     def get_current_wallpaper(self):

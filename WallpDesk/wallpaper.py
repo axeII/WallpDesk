@@ -99,7 +99,7 @@ class Editor(wall.Paper):
         if self.collect_queue.empty():
             images = self.db.get_items(type_ = theme)
             image = images[random.choice(list(images.keys()))]
-            super().set_wallpaper(f"{image[1]}/{image[0]}")
+            super().set_wallpaper_with_effect(f"{image[1]}/{image[0]}")
 
     def run(self):
         if self.run_queue.empty():
