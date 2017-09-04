@@ -13,6 +13,8 @@ import database
 import datetime
 import threading
 from queue import Queue
+from subprocess import Popen, PIPE
+
 
 class Editor(wall.Paper):
 
@@ -55,6 +57,8 @@ class Editor(wall.Paper):
                 print(f"ading: {img}")
                 self.db.new_item(data)
             print("all images loaded to databse")
+            cmd = b"""display notification "All images are loaded to database" with title "WallpDesk" subtitle "Database synchronization" """
+            Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd)
         try:
             self.collect_queue.get()
         except:
