@@ -30,6 +30,7 @@ class DB_lite:
             self.cursor.execute("""
                 CREATE TABLE IF NOT EXISTS settings(id INTEGER PRIMARY KEY, set_path TEXT)
             """)
+            self.cursor.execute(f"""INSERT INTO settings(set_path) VALUES("init_value") """)
             self.db.commit()
         except Exception as excpt:
             self.db.rollback()
@@ -47,7 +48,7 @@ class DB_lite:
                 print('[Error] Record already exists')
 
     def set_wall_path(self,in_path):
-        self.cursor.execute(f"""INSERT INTO settings(set_path) VALUES("{in_path}") """)
+        self.cursor.execute(f"""UPDATE settings SET set_path to {in_path} where id=1 """)
         self.db.commit()
 
     def get_wall_path(self):
@@ -100,12 +101,3 @@ class DB_lite:
     def __exit__(self):
         self.db.close()
 
-if __name__ == "__main__":
-    h = DB_lite()
-    d = {"name": 'test01',"path": 'random/paht/', "type" : 'light'}
-    h.new_item(d)
-    print(h.get_items(type_ = "light"))
-    print(h.get_one_item("test01"))
-    #h.set_wall_path(f"{HOME}/WallTimeDay")
-    print(h.get_wall_path())
-    h.reset_table()

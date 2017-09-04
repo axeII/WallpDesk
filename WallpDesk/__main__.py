@@ -12,8 +12,7 @@ from subprocess import call
 def main():
     path_ = f"{HOME}/Library/Application Support/WallpDesk"
     call(["mkdir", "-p", path_])
-    walpdesk = Bar()
-    walpdesk.run()
+    Bar().run()
 
 if __name__ == "__main__":
     main()
