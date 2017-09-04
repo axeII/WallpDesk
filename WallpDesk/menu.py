@@ -10,6 +10,7 @@ import wallpaper
 from wall import HOME
 from os.path import isfile
 from database import DB_lite
+from subprocess import Popen, PIPE
 
 class Bar(rumps.App):
 
@@ -43,17 +44,15 @@ class Bar(rumps.App):
 
     @rumps.clicked("Settings")
     def settings(self, _):
-        #file_path = filedialog.askdirectory() NSError
-        file_path = rumps.Window(message="Set wallpaper absolute path", title='Path',
-                default_text=self.def_wallpaper,
-                ok="Ok", cancel="Cancel",
-                dimensions=(320, 120)).run()
-        if self.def_wallpaper != file_path.text:
-            print(file_path.text)
-            if file_path.text != "None":
-                self.def_wallpaper = file_path.text
-                self.db.set_wall_path(file_path.text)
-                self.editor.set_loading_dir(self.def_wallpaper)
+        cmd = b"""choose folder with prompt "Please select an output folder:" """
+        proc = Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE)
+        file_path, _ = proc.communicate(cmd)
+        file_path = file_path.decode("utf-8").replace("alias Macintosh HD",'').replace('\n','').replace(':','/')
+        if self.def_wallpaper != file_path and proc.returncode == 0:
+            print(file_path)
+            self.def_wallpaper = file_path
+            self.db.set_wall_path(file_path)
+            self.editor.set_loading_dir(self.def_wallpaper)
 
     @rumps.clicked("Desktop daemon")
     def on_off_test(self, sender):
@@ -91,5 +90,3 @@ class Bar(rumps.App):
         print("Quit application")
         rumps.quit_application()
 
-if __name__ == "__main__":
-    Bar().run()
