@@ -10,8 +10,8 @@ import time
 import random
 import analyzer
 import database
-import datetime
 import threading
+import horizon
 from queue import Queue
 from subprocess import Popen, PIPE
 
@@ -55,7 +55,7 @@ class Editor(wall.Paper):
                         f"{os.path.abspath(self.directory)}/{img}"),
                 }
                 print(f"ading: {img}")
-                self.db.new_item(data)
+                self.db.new_item("wallpapers",data)
             print("all images loaded to databse")
             cmd = b"""display notification "All images are loaded to database" with title "WallpDesk" subtitle "Database synchronization" """
             Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd)
@@ -94,8 +94,12 @@ class Editor(wall.Paper):
     def choose_random_image(self):
         """choose dark or light based on time but random"""
         self.sync_with_db()
-        hour = datetime.datetime.today().hour
-        if hour >= 20 or (hour >= 0 and hour < 8):
+        data_h = horizon.get_horizon_time(self.db.get_zone())
+        hour, sunset, sunrise = (data_h["today_time"][0], data_h["sunset"][0], data_h["sunrise"][0])
+
+        if hour >= sunset-2 and hour < sunset+1:
+            theme = "evening"
+        elif hour >= sunset or (hour >= 0 and hour < sunrise):
             theme = "dark"
         else:
             theme = "light"
@@ -103,7 +107,13 @@ class Editor(wall.Paper):
         if self.collect_queue.empty():
             images = self.db.get_items(type_ = theme)
             image = images[random.choice(list(images.keys()))]
+            print(image)
             super().set_wallpaper_with_effect(f"{image[1]}/{image[0]}")
+
+    def choose_last_image(self):
+        self.sync_with_db()
+        if self.collect_queue.empty():
+            super().set_wallpaper_with_effect(self.db.get_last_wallpaper()[1])
 
     def run(self):
         if self.run_queue.empty():
