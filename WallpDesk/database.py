@@ -28,9 +28,14 @@ class DB_lite:
                                    path TEXT, type TEXT)
             """)
             self.cursor.execute("""
+                CREATE TABLE IF NOT EXISTS history(id INTEGER PRIMARY KEY, path TEXT, name TEXT)
+            """)
+            self.cursor.execute("""
                 CREATE TABLE IF NOT EXISTS settings(id INTEGER PRIMARY KEY, set_path TEXT)
             """)
-            self.cursor.execute(f"""INSERT INTO settings(set_path) VALUES("init_value") """)
+            self.cursor.execute("""
+                CREATE TABLE IF NOT EXISTS timezone(id INTEGER PRIMARY KEY, zone TEXT)
+            """)
             self.db.commit()
         except Exception as excpt:
             self.db.rollback()
@@ -38,21 +43,51 @@ class DB_lite:
             self.db.close()
             raise excpt
 
-    def new_item(self,data):
-        if data:
+    def new_item(self, table, data):
+        if data and table:
             try:
-                self.cursor.execute(f"""INSERT INTO wallpapers(name, path, type)
-                                  VALUES("{data["name"]}","{data["path"]}","{data["type"]}")""")
+                if table == "wallpapers":
+                    self.cursor.execute(f"""INSERT INTO wallpapers(name, path, type)
+                                      VALUES("{data["name"]}","{data["path"]}","{data["type"]}")""")
+                elif table == "history":
+                    self.cursor.execute(f"""INSERT INTO history(path, name)
+                                      VALUES("{data[name]}", "{data[path]}")""")
                 self.db.commit()
             except sqlite3.IntegrityError:
                 print('[Error] Record already exists')
 
     def set_wall_path(self,in_path):
-        self.cursor.execute(f"""UPDATE settings SET set_path = "{in_path}" where id=1 """)
+        self.cursor.execute(f"""INSERT OR UPDATE INTO settings(id, set_path) VALUES (1,"{in_path}")""")
         self.db.commit()
+
+    def set_timezone(self,zone):
+        self.cursor.execute(f"""INSERT OR UPDATE INTO timezone(id, zone) VALUES (1,"{zone}")""")
+        self.db.commit()
+
+    def get_names(self):
+        ret = []
+        self.cursor.execute("""SELECT id, name, path, type FROM wallpapers""")
+        for row in self.cursor:
+            ret.append(row[1])
+        return ret
+
+    def get_one_item(self,which_one):
+        self.cursor.execute("""SELECT name, path, type FROM wallpapers WHERE name=?""", (which_one,))
+        return self.cursor.fetchone()
+
+    def get_last_wallpaper(self):
+        self.cursor.execute("""SELECT name, path FROM history WHERE id=(SELECT MAX(id) FROM history)""")
+        return self.cursor.fetchone()
 
     def get_wall_path(self):
         self.cursor.execute("""SELECT * FROM settings WHERE id=1""")
+        try:
+            return self.cursor.fetchone()[1]
+        except:
+            return None
+
+    def get_zone(self):
+        self.cursor.execute("""SELECT * FROM timezon WHERE id=1""")
         try:
             return self.cursor.fetchone()[1]
         except:
@@ -65,20 +100,8 @@ class DB_lite:
         else:
             self.cursor.execute("""SELECT id, name, path, type FROM wallpapers""")
         for row in self.cursor:
-            # row[0] returns the first column in the query
             data_items[row[0]] = [row[1],row[2],row[3]]
         return data_items
-
-    def get_names(self):
-        ret = []
-        self.cursor.execute("""SELECT id, name, path, type FROM wallpapers""")
-        for row in self.cursor:
-            ret.append(row[1])
-        return ret
-
-    def get_one_item(self,which_one):
-        self.cursor.execute("""SELECT name, path, type FROM wallpapers WHERE name=?""", (which_one,))
-        return self.cursor.fetchone()
 
     def update_item_path(self,value, name):
         self.cursor.execute("""UPDATE wallpapers SET path = ? WHERE name = ? """,
