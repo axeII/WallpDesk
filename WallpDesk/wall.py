@@ -9,12 +9,15 @@ import subprocess
 
 HOME = os.getenv("HOME")
 
+from database import DB_lite
+
 class Paper:
 
     def __init__(self, directory):
         self.img_files = []
         self.interrupted = False
         self.directory = directory
+        self.db = DB_lite()
         self.types = (".jpg",".png",".jpeg",".tiff")
 
     def set_directory(self, directory):
@@ -42,10 +45,11 @@ end tell"""
 
         for file_ in os.listdir(path):
             subprocess.call(["mv", f"{path}/{file_}", f"{HOME}/.Trash/"])
+            self.save_current_wallpaper(file_)
         subprocess.call(["cp", os.path.abspath(img), path])
 
-    def get_current_wallpaper(self):
-       pass
+    def save_current_wallpaper(self, wallp):
+        self.db.new_item("history",{"name": wallp, "path": self.directory})
 
     def get_images_files(self):
         self.img_files = []

@@ -16,9 +16,10 @@ class Bar(rumps.App):
 
     def __init__(self):
         super().__init__("WallpDesk")
-        self.menu = ["About","Settings","Reset database", None,
-                "Desktop daemon", "Wallpaper daemon", None
-                ,"Next wallpaper", "Quit"]
+        self.menu = ["About",None,"Setup Directory",
+                "Reset database", None, "Desktop daemon",
+                "Wallpaper daemon", None, "Next wallpaper",
+                "Previous wallpaper", None, "Quit"]
         self.db = DB_lite()
         self.def_wallpaper = self.db.get_wall_path()
         self.quit_button = None
@@ -34,15 +35,20 @@ class Bar(rumps.App):
 
     @rumps.clicked("About")
     def about(self, _):
-        rumps.Window(message="\t   WallpDesk (0.0.4)", title="\tAbout WallpDesk",
-                default_text="""\n\tVersion: 0.0.4\n\n\tLicence: MIT\n\n\tAuthor: Ales Lerch""",
-            dimensions=(170, 130)).run()
+        rumps.Window(message="\t   WallpDesk (0.1.0)", title="\tAbout WallpDesk",
+                default_text="""\tVersion: 0.1.0\n\tLicence: MIT\n\tAuthor: Ales Lerch
+\nHow to use:\n 1) Setup directory
+2) Wait for image to load to database with
+image control (Notification will notify you.
+3) Start damon and choose time interval
+Desktop daemon is used for managing files at desktop.
+Use: @{command}file (readme.md)""", dimensions=(210, 250)).run()
 
     @rumps.clicked("Reset database")
     def reset_db(self, _):
         self.editor.reset_library()
 
-    @rumps.clicked("Settings")
+    @rumps.clicked("Setup Directory")
     def settings(self, _):
         cmd = b"""choose folder with prompt "Please select an output folder:" """
         proc = Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE)
@@ -84,6 +90,10 @@ class Bar(rumps.App):
     @rumps.clicked("Next wallpaper")
     def next_wallpaper(self,_):
         self.editor.choose_random_image()
+
+    @rumps.clicked("Previous wallpaper")
+    def previous_wallpaper(self,_):
+        self.editor.choose_last_image()
 
     @rumps.clicked("Quit")
     def clean_up_before_quit(self,_):
