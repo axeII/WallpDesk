@@ -1,3 +1,8 @@
+"""Analyzer
+
+Analyzer module for setting menu bar setup for OSX
+"""
+__author__ = 'ales lerch'
 
 import os
 import cv2
@@ -8,7 +13,7 @@ def check_image_color(image):
     Y -- converting to gray to detect if it's really dark or light"""
 
     def check_color(i,j,k):
-        """ Function use only for debuging"""
+        """ Function used only for DEBUGGING"""
         from PIL import Image
         #img.show()
         image = Image.new("RGB", (200, 200), (int(Y),int(Y),int(Y)))
@@ -29,7 +34,11 @@ def check_image_color(image):
     except:
         return "Error with image"
 
-    return "dark" if Y < 100 else "light"
+    if Y < 72.0:
+        _type = "dark"
+    elif Y >= 73.0 and Y <= 108.0:
+        _type = "evening"
+    else:
+        _type = "light"
 
-if __name__=="__main__":
-    print(check_image_color("test.jpg"))
+    return _type
