@@ -17,11 +17,17 @@ class Bar(rumps.App):
     def __init__(self):
         super().__init__("WallpDesk")
         self.menu = ["About",None,"Setup Directory",
-                "Reset database", None, "Desktop daemon",
-                "Wallpaper daemon", None, "Next wallpaper",
-                "Previous wallpaper", None, "Quit"]
+                "Reset Database", None, "Activate Desktop",
+                {"Activate Wallpaper":
+                [rumps.MenuItem("5 minutes", callback=self.activate),
+                 rumps.MenuItem("15 minutes", callback=self.activate),
+                 rumps.MenuItem("30 minutes", callback=self.activate),
+                 rumps.MenuItem("1 hour", callback=self.activate),
+                ]
+                }, None, "Next Wallpaper", "Previous Wallpaper", None, "Quit"]
+        self.default_times = ("5 minutes","15 minutes","30 minutes", "1 hour")
         self.db = DB_lite()
-        self.def_wallpaper = self.db.get_wall_path()
+        self.default_wall = self.db.get_wall_path()
         self.quit_button = None
         self.template = True
         self.title = None
@@ -44,7 +50,7 @@ image control (Notification will notify you.
 Desktop daemon is used for managing files at desktop.
 Use: @{command}file (readme.md)""", dimensions=(210, 250)).run()
 
-    @rumps.clicked("Reset database")
+    @rumps.clicked("Reset Database")
     def reset_db(self, _):
         self.editor.reset_library()
 
@@ -54,44 +60,60 @@ Use: @{command}file (readme.md)""", dimensions=(210, 250)).run()
         proc = Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE)
         file_path, _ = proc.communicate(cmd)
         file_path = file_path.decode("utf-8").replace("alias Macintosh HD",'').replace('\n','').replace(':','/')
-        if self.def_wallpaper != file_path and proc.returncode == 0:
+        if self.default_wall != file_path and proc.returncode == 0:
             print(file_path)
-            self.def_wallpaper = file_path
+            self.default_wall = file_path
             self.db.set_wall_path(file_path)
-            self.editor.set_loading_dir(self.def_wallpaper)
+            self.editor.set_loading_dir(self.default_wall)
 
-    @rumps.clicked("Desktop daemon")
+    @rumps.clicked("Activate Desktop")
     def on_off_test(self, sender):
         """ notifications are so far broken in rumps
         rumps.notification(title='Hi', subtitle='There.', message='Friend!',
         sound=does_something.sound, data=my_data)"""
         sender.state = not sender.state
         if sender.state:
-            rumps.alert(message='You are now running desktop daemon')
+            #rumps.alert(message='You are now running desktop daemon')
+            cmd = b"""display notification "You are now running desktop daemon" with title\
+            "WallpDesk" subtitle "Desktop Activation" """
+            Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd)
             self.desktop.interrupted = False
             self.desktop.run()
         else:
             self.desktop.interrupted = True
 
-    @rumps.clicked("Wallpaper daemon")
-    def wallpaper(self, sender):
-        if self.def_wallpaper:
-            sender.state = not sender.state
-            if sender.state:
-                rumps.alert(message='You are now running wallpaper daemon', ok='OK')
-                print(self.def_wallpaper)
-                self.editor.interrupted = False
-                self.editor.run()
+    def activate(self, sender):
+        try:
+            if self.default_wall and str(sender.title) in self.default_times:
+                sender.state = not sender.state
+                for ru_state in [st for st in self.default_times if st != sender.title]:
+                    self.menu["Activate Wallpaper"][ru_state].state = False
+                if sender.state:
+                    #rumps.alert(message='You are now running wallpaper daemon', ok='OK')
+                    cmd = f"""display notification "You are now running wallpaper for {sender.title} daemon" with title\
+                    "WallpDesk" subtitle "Wallpaper Activation" """
+                    Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd.encode())
+                    r_time = {"5 minutes": 300,"15 minutes": 900,"30 minutes": 1800, "1 hour":
+                            3600}
+                    try:
+                        print(sender.title,r_time[str(sender.title)])
+                        self.editor.time = r_time[str(sender.title)]
+                        self.editor.interrupted = True
+                        self.editor.interrupted = False
+                        self.editor.run()
+                    except KeyError:
+                        rumps.alert(f"{sender.title} key not an option!")
+                #elif not any([x for x in self.menu["Activate Wallpaper"]]):
             else:
-                self.editor.interrupted = True
-        else:
-            rumps.alert("No input path for images set!")
+                rumps.alert("No input path for images set!")
+        except Exception as e:
+            print(e)
 
-    @rumps.clicked("Next wallpaper")
+    @rumps.clicked("Next Wallpaper")
     def next_wallpaper(self,_):
         self.editor.choose_random_image()
 
-    @rumps.clicked("Previous wallpaper")
+    @rumps.clicked("Previous Wallpaper")
     def previous_wallpaper(self,_):
         self.editor.choose_last_image()
 

@@ -95,6 +95,8 @@ class Editor(wall.Paper):
         """choose dark or light based on time but random"""
         self.sync_with_db()
         data_h = horizon.get_horizon_time(self.db.get_zone())
+        if data_h["timezone"]:
+            self.db.set_timezone(data_h["timezone"])
         hour, sunset, sunrise = (data_h["today_time"][0], data_h["sunset"][0], data_h["sunrise"][0])
 
         if hour >= sunset-2 and hour < sunset+1:
@@ -108,12 +110,14 @@ class Editor(wall.Paper):
             images = self.db.get_items(type_ = theme)
             image = images[random.choice(list(images.keys()))]
             print(image)
-            super().set_wallpaper_with_effect(f"{image[1]}/{image[0]}")
+            super().set_wallpaper_with_effect(f"{image[1]}/{image[0]}", True)
 
     def choose_last_image(self):
         self.sync_with_db()
         if self.collect_queue.empty():
-            super().set_wallpaper_with_effect(self.db.get_last_wallpaper()[1])
+            img = self.db.get_last_wallpaper()
+            super().set_wallpaper_with_effect(f"{img[0]}/{img[1]}", False)
+            self.db.del_last_history()
 
     def run(self):
         if self.run_queue.empty():
@@ -122,8 +126,13 @@ class Editor(wall.Paper):
 
     def loop(self):
         while True:
-            time.sleep(self.time)
-            if self.interrupted:
-                break
+            print(f"Wallpaper will spleep for {self.time}")
+            print(threading.current_thread(),"starting now time sleep for ",self.time)
+            for _ in range(self.time):
+                time.sleep(0.1)
+                print(self.interrupted)
+                if self.interrupted:
+                    print(threading.current_thread(),"ending now time sleep for ")
+                    break
             self.choose_random_image()
 
