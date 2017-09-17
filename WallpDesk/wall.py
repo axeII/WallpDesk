@@ -28,25 +28,29 @@ class Paper:
         subprocess.call(["sqlite3", db_file, f"update data set value = '{img}'"])
         subprocess.call(["killall", "Dock"])
 
-    def set_wallpaper_with_effect(self, img):
-        path = f"{HOME}/Library/Application Support/WallpDesk/current/"
-        cmd = b"""tell application "System Events"
-	tell current desktop
-		set picture rotation to 1 -- (0=off, 1=interval, 2=login, 3=sleep)
-		set random order to true
-		set pictures folder to alias "Macintosh HD:Users:ales:Library:Application Support:WallpDesk:current:"
-		set change interval to 5.0
-	end tell
-end tell"""
-        subprocess.call(["mkdir","-p", path])
-        subprocess.Popen(["osascript", '-'],
-                         stdin=subprocess.PIPE,
-                         stdout=subprocess.PIPE).communicate(cmd)
+    def set_wallpaper_with_effect(self, img, save):
+        if img:
+            path = f"{HOME}/Library/Application Support/WallpDesk/current/"
+            cmd = b"""tell application "System Events"
+        tell current desktop
+            set picture rotation to 1 -- (0=off, 1=interval, 2=login, 3=sleep)
+            set random order to true
+            set pictures folder to alias "Macintosh HD:Users:ales:Library:Application Support:WallpDesk:current:"
+            set change interval to 5.0
+        end tell
+    end tell"""
+            subprocess.call(["mkdir","-p", path])
+            subprocess.Popen(["osascript", '-'],
+                             stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE).communicate(cmd)
 
-        for file_ in os.listdir(path):
-            subprocess.call(["mv", f"{path}/{file_}", f"{HOME}/.Trash/"])
-            self.save_current_wallpaper(file_)
-        subprocess.call(["cp", os.path.abspath(img), path])
+            for file_ in os.listdir(path):
+                subprocess.call(["mv", f"{path}/{file_}", f"{HOME}/.Trash/"])
+                if save:
+                    self.save_current_wallpaper(file_)
+            subprocess.call(["cp", os.path.abspath(img), path])
+        else:
+            print("No image found in history")
 
     def save_current_wallpaper(self, wallp):
         self.db.new_item("history",{"name": wallp, "path": self.directory})

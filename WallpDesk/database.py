@@ -51,17 +51,17 @@ class DB_lite:
                                       VALUES("{data["name"]}","{data["path"]}","{data["type"]}")""")
                 elif table == "history":
                     self.cursor.execute(f"""INSERT INTO history(path, name)
-                                      VALUES("{data[name]}", "{data[path]}")""")
+                                      VALUES("{data["name"]}", "{data["path"]}")""")
                 self.db.commit()
             except sqlite3.IntegrityError:
                 print('[Error] Record already exists')
 
     def set_wall_path(self,in_path):
-        self.cursor.execute(f"""INSERT OR UPDATE INTO settings(id, set_path) VALUES (1,"{in_path}")""")
+        self.cursor.execute(f"""REPALCE INTO settings(id, set_path) VALUES (1,"{in_path}")""")
         self.db.commit()
 
     def set_timezone(self,zone):
-        self.cursor.execute(f"""INSERT OR UPDATE INTO timezone(id, zone) VALUES (1,"{zone}")""")
+        self.cursor.execute(f"""REPLACE INTO timezone(id, zone) VALUES(1, "{zone}")""")
         self.db.commit()
 
     def get_names(self):
@@ -87,7 +87,7 @@ class DB_lite:
             return None
 
     def get_zone(self):
-        self.cursor.execute("""SELECT * FROM timezon WHERE id=1""")
+        self.cursor.execute("""SELECT * FROM timezone WHERE id=1""")
         try:
             return self.cursor.fetchone()[1]
         except:
@@ -110,6 +110,10 @@ class DB_lite:
 
     def del_item(self, item_name):
         self.cursor.execute(f"""DELETE FROM wallpapers WHERE name = {item_name} """)
+        self.db.commit()
+
+    def del_last_history(self):
+        self.cursor.execute("""DELETE FROM history WHERE id=(SELECT MAX(id) FROM history)""")
         self.db.commit()
 
     def delete_table(self):

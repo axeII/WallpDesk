@@ -35,6 +35,6 @@ def get_horizon_time(db_city = ""):
             "sunset": (sunset.hour, sunset.minute, sunset.second),
             "sunrise": (sunrise.hour, sunrise.minute, sunrise.second),
             "today_time": (time.hour, time.minute, time.second),
-            "timezone": city,
+            "timezone": city.name,
     }
 
