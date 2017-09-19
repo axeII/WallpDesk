@@ -4,8 +4,10 @@ python:
 
 install:
  - python -m easy_install -U setuptools
- - pip install Pillow
-   # - pip install rumps
+ - pip install python-dateutil
+ - pip install opencv-python
+ - pip install astral
+ - pip install numpy
 
 script:
  - python setup.py test

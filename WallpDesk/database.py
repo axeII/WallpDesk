@@ -17,6 +17,7 @@ class DB_lite:
             self.db = sqlite3.connect(f"{path_to_db}pydesktop.db", check_same_thread=False)
         except Exception:
             print("[Error] Database not found creating database")
+            subprocess.call(["mkdir","-p", f"{path_to_db}"])
             subprocess.call(["touch", f"{path_to_db}pydesktop.db"])
             self.db = sqlite3.connect(f"{path_to_db}pydesktop.db", check_same_thread=False)
 
