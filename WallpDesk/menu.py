@@ -7,9 +7,8 @@ __author__ = 'ales lerch'
 import rumps
 import desktop
 import wallpaper
-from wall import HOME
 from os.path import isfile
-from database import DB_lite
+from database import DB_lite, HOME
 from subprocess import Popen, PIPE
 
 class Bar(rumps.App):
@@ -106,10 +105,9 @@ Use: @{command}file (readme.md)""", dimensions=(210, 250)).run()
                 #if not any([y.sate for y in [ for x in self.menu["Activate Wallpaper"]]):
                 list_ = []
                 for aw in self.default_times:
-                    list_.append(self.menu["Activate Wallpaper"][aw])
-                    print(list_[-1])
+                    list_.append(self.menu["Activate Wallpaper"][aw].state)
                 if not any(list_):
-                    print('killing time')
+                    print("killing process P_changing_image")
                     self.editor.shut_down("P_changing_image")
             else:
                 rumps.alert("No input path for images set!")

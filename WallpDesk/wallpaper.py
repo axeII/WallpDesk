@@ -121,5 +121,6 @@ class Editor(wall.Paper):
             self.choose_random_image()
 
     def run(self):
+        print(f"runing editorh with time: {self.time}")
         Process(target=self.changing_image,name="P_changing_image",daemon=True).start()
 

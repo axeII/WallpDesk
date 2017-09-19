@@ -6,11 +6,12 @@ __author__ = 'ales lerch'
 
 import os
 import re
+import wall
 import time
 import shutil
 import subprocess
 from enum import Enum
-from wall import Paper, HOME
+from database import HOME
 from multiprocessing import Process
 
 class Lexer_state(Enum):
@@ -18,7 +19,7 @@ class Lexer_state(Enum):
     word = 2
     operation = 3
 
-class Daemon(Paper):
+class Daemon(wall.Paper):
 
     def __init__(self, delay = 5):
         super().__init__(f"{HOME}/Desktop/")
@@ -26,19 +27,15 @@ class Daemon(Paper):
     def check_desktop(self):
         while True:
             time.sleep(0.6)
-            super().get_images_files()
-            for file_ in self.img_files:
-                if file_.startswith('@'):
-                    O, T, C = self.lexer(file_)
-                    print(O,T,C)
-                    self.evaluate(O, T, C)
+            super().get_images_files(any_ = True)
+            for file_ in filter(lambda x: x.startswith('@'), self.img_files):
+                self.evaluate(self.lexer(file_))
 
     def run(self):
         Process(target=self.check_desktop, name = "P_desktop_manager", daemon = True).start()
 
     def lexer(self,text):
-        """
-        token stands for file name, commands are operations
+        """ token stands for file name, commands are operations
         that should be done"""
         token = ""
         command = ""
@@ -84,14 +81,14 @@ class Daemon(Paper):
 
         return (orginal, token,[command])
 
-    def evaluate(self,original, file_name,commands):
+    def evaluate(self, args):
 
         def desktop(org, file_):
             subprocess.call(["mv", "-n", f"{HOME}/Desktop/{org}",f"{HOME}/Desktop/{file_}"])
             super(Daemon,self).set_wallpaper(
                     f"{HOME}/Desktop/{file_}")
 
-
+        original, file_name, commands = args
         command_list = {
                 "pixiv": lambda n :
                 subprocess.call(["mv","-n",f"{HOME}/Desktop/{n[0]}",
