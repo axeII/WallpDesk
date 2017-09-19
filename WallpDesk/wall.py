@@ -6,6 +6,7 @@ __author__ = 'ales lerch'
 
 import os
 import subprocess
+from multiprocessing import active_children
 
 HOME = os.getenv("HOME")
 
@@ -66,4 +67,12 @@ class Paper:
                 print(f"{self.directory} folder not found")
         else:
             print("Folder for images not found")
+
+    def shut_down(self, name):
+        #in future update use mutltiprocessing.queue for sperate processes
+        for process in active_children():
+            if process.name == name:
+                print(f"Shutting down process {process}, {process.name}, {os.getpid()}")
+                process.terminate()
+                process.join()
 
