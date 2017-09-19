@@ -77,10 +77,11 @@ Use: @{command}file (readme.md)""", dimensions=(210, 250)).run()
             cmd = b"""display notification "You are now running desktop daemon" with title\
             "WallpDesk" subtitle "Desktop Activation" """
             Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd)
-            self.desktop.interrupted = False
+            print("Activating desktop manager")
+            self.desktop.shut_down("P_desktop_manager")
             self.desktop.run()
         else:
-            self.desktop.interrupted = True
+            self.desktop.shut_down("P_desktop_manager")
 
     def activate(self, sender):
         try:
@@ -98,12 +99,18 @@ Use: @{command}file (readme.md)""", dimensions=(210, 250)).run()
                     try:
                         print(sender.title,r_time[str(sender.title)])
                         self.editor.time = r_time[str(sender.title)]
-                        self.editor.interrupted = True
-                        self.editor.interrupted = False
+                        self.editor.shut_down("P_changing_image")
                         self.editor.run()
                     except KeyError:
                         rumps.alert(f"{sender.title} key not an option!")
-                #elif not any([x for x in self.menu["Activate Wallpaper"]]):
+                #if not any([y.sate for y in [ for x in self.menu["Activate Wallpaper"]]):
+                list_ = []
+                for aw in self.default_times:
+                    list_.append(self.menu["Activate Wallpaper"][aw])
+                    print(list_[-1])
+                if not any(list_):
+                    print('killing time')
+                    self.editor.shut_down("P_changing_image")
             else:
                 rumps.alert("No input path for images set!")
         except Exception as e:
@@ -111,14 +118,20 @@ Use: @{command}file (readme.md)""", dimensions=(210, 250)).run()
 
     @rumps.clicked("Next Wallpaper")
     def next_wallpaper(self,_):
+        print("Clicked next wallpaer")
         self.editor.choose_random_image()
 
     @rumps.clicked("Previous Wallpaper")
     def previous_wallpaper(self,_):
+        print("Clicked previous wallpaer")
         self.editor.choose_last_image()
 
     @rumps.clicked("Quit")
     def clean_up_before_quit(self,_):
+        import multiprocessing
+        for pr in multiprocessing.active_children():
+            pr.terminate()
+            pr.join()
         print("Quit application")
         rumps.quit_application()
 

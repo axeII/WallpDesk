@@ -8,11 +8,10 @@ import os
 import re
 import time
 import shutil
-import threading
 import subprocess
 from enum import Enum
-from queue import Queue
-from wall import Paper,HOME
+from wall import Paper, HOME
+from multiprocessing import Process
 
 class Lexer_state(Enum):
     s = 1
@@ -23,25 +22,19 @@ class Daemon(Paper):
 
     def __init__(self, delay = 5):
         super().__init__(f"{HOME}/Desktop/")
-        self.que = Queue(maxsize = 1)
-        self.que.put(threading.Thread(target=self.loop))
 
-    def run(self):
-        if self.que.empty():
-            self.que.put(threading.Thread(target=self.loop))
-        self.que.get().start()
-
-    def loop(self):
+    def check_desktop(self):
         while True:
-            time.sleep(2.0)
-            if self.interrupted:
-                break
-
-            super(Daemon,self).get_images_files()
+            time.sleep(0.6)
+            super().get_images_files()
             for file_ in self.img_files:
                 if file_.startswith('@'):
                     O, T, C = self.lexer(file_)
+                    print(O,T,C)
                     self.evaluate(O, T, C)
+
+    def run(self):
+        Process(target=self.check_desktop, name = "P_desktop_manager", daemon = True).start()
 
     def lexer(self,text):
         """
