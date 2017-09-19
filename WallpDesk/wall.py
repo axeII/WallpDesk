@@ -8,9 +8,10 @@ import os
 import subprocess
 from multiprocessing import active_children
 
-HOME = os.getenv("HOME")
-
-from database import DB_lite
+try:
+    from database import DB_lite, HOME
+except ModuleNotFoundError:
+    from .database import DB_lite, HOME
 
 class Paper:
 
@@ -56,12 +57,15 @@ class Paper:
     def save_current_wallpaper(self, wallp):
         self.db.new_item("history",{"name": wallp, "path": self.directory})
 
-    def get_images_files(self):
+    def get_images_files(self, any_ = False):
         self.img_files = []
         if self.directory:
             if self.directory and os.path.isdir(self.directory):
                 for img_file in os.listdir(self.directory):
-                    if os.path.splitext(img_file)[1] in self.types and img_file not in self.img_files:
+                    if os.path.splitext(img_file)[1] in self.types \
+                            and img_file not in self.img_files and not any_:
+                        self.img_files.append(img_file)
+                    elif img_file not in self.img_files and any_:
                         self.img_files.append(img_file)
             else:
                 print(f"{self.directory} folder not found")

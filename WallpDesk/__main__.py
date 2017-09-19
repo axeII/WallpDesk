@@ -6,7 +6,7 @@ desktop file name commands
 __author__ = 'ales lerch'
 
 from menu import Bar
-from wall import HOME
+from database import HOME
 from subprocess import call
 
 def main():

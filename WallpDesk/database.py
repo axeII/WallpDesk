@@ -4,12 +4,11 @@ Database model for comunicating with database
 """
 __author__ = 'ales lerch'
 
+import os
 import sqlite3
 import subprocess
-try:
-    from wall import HOME
-except ModuleNotFoundError:
-    from .wall import HOME
+
+HOME = os.getenv("HOME")
 
 class DB_lite:
 
@@ -57,7 +56,7 @@ class DB_lite:
                 print('[Error] Record already exists')
 
     def set_wall_path(self,in_path):
-        self.cursor.execute(f"""REPALCE INTO settings(id, set_path) VALUES (1,"{in_path}")""")
+        self.cursor.execute(f"""REPLACE INTO settings(id, set_path) VALUES (1,"{in_path}")""")
         self.db.commit()
 
     def set_timezone(self,zone):

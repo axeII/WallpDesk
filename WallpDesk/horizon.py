@@ -23,7 +23,10 @@ def get_horizon_time(db_city = ""):
             """ Neutral city london for settings in case of error"""
             city = astr["London"]
     else:
-        city = astr[db_city]
+        try:
+            city = astr[db_city]
+        except:
+            return {}
 
     today = datetime.date.today()
     time = datetime.datetime.today()
