@@ -7,7 +7,8 @@ class TestDatabase(unittest.TestCase):
 
     def setUp(self):
         self.db = DB_lite("tests/test_files/")
-        self.db.new_item({"name": 'test01',"path": 'random/paht/', "type" : 'light'})
+        self.db.new_item("wallpapers",{"name": 'test01',"path": 'random/paht/', "type" : 'light'})
+        self.db.set_wall_path("old_path")
 
     def tearDown(self):
         self.db.reset_table()
@@ -27,6 +28,17 @@ class TestDatabase(unittest.TestCase):
         self.db.set_wall_path("test/path/to/wall/imags")
         result = self.db.get_wall_path()
         self.assertEqual(result, "test/path/to/wall/imags")
+
+    def test_get_wall_path(self):
+        """> Check getting wall path"""
+        result = self.db.get_wall_path()
+        self.assertEqual(result, "old_path")
+
+    def test_set_wall_path(self):
+        """> Check settings wall path"""
+        self.db.set_wall_path("new_path")
+        result = self.db.get_wall_path()
+        self.assertEqual(result, "new_path")
 
 if __name__ == "__main__":
     unittest.main()
