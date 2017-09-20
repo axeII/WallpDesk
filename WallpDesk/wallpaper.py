@@ -84,7 +84,10 @@ class Editor(wall.Paper):
         print("starting thread to reset lb")
         self.run_loading_images()
 
-    def choose_random_image(self):
+    def check_alive_process(self):
+        return self.process.is_alive()
+
+    def choose_random_image(self, _alive):
         """choose dark or light based on time but random"""
         self.sync_with_db()
         data_h = horizon.get_horizon_time(self.db.get_zone())
@@ -99,7 +102,7 @@ class Editor(wall.Paper):
         else:
             theme = "light"
 
-        if not self.process.is_alive():
+        if not _alive:
             images = self.db.get_items(type_ = theme)
             image = images[random.choice(list(images.keys()))]
             print(image)
@@ -115,12 +118,12 @@ class Editor(wall.Paper):
             super().set_wallpaper_with_effect(f"{img[0]}/{img[1]}", False)
             self.db.del_last_history()
 
-    def changing_image(self):
+    def changing_image(self, alive_):
         while True:
             time.sleep(self.time)
-            self.choose_random_image()
+            self.choose_random_image(alive_)
 
-    def run(self):
+    def run(self, alive = None):
         print(f"runing editorh with time: {self.time}")
-        Process(target=self.changing_image,name="P_changing_image",daemon=True).start()
+        Process(target=self.changing_image, args=(alive,),name="P_changing_image",daemon=True).start()
 

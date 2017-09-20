@@ -40,8 +40,8 @@ class Bar(rumps.App):
 
     @rumps.clicked("About")
     def about(self, _):
-        rumps.Window(message="\t   WallpDesk (0.1.0)", title="\tAbout WallpDesk",
-                default_text="""\tVersion: 0.1.0\n\tLicence: MIT\n\tAuthor: Ales Lerch
+        rumps.Window(message="\t   WallpDesk (0.1.1)", title="\tAbout WallpDesk",
+                default_text="""\tVersion: 0.1.1\n\tLicence: MIT\n\tAuthor: Ales Lerch
 \nHow to use:\n 1) Setup directory
 2) Wait for image to load to database with
 image control (Notification will notify you.
@@ -97,9 +97,10 @@ Use: @{command}file (readme.md)""", dimensions=(210, 250)).run()
                             3600}
                     try:
                         print(sender.title,r_time[str(sender.title)])
+                        print(r_time[str(sender.title)])
                         self.editor.time = r_time[str(sender.title)]
                         self.editor.shut_down("P_changing_image")
-                        self.editor.run()
+                        self.editor.run(self.editor.check_alive_process())
                     except KeyError:
                         rumps.alert(f"{sender.title} key not an option!")
                 #if not any([y.sate for y in [ for x in self.menu["Activate Wallpaper"]]):
