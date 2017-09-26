@@ -110,8 +110,8 @@ class Editor(wall.Paper):
                 super().set_wallpaper_with_effect(f"{image[1]}/{image[0]}", True)
             except Exception as e:
                 print(e)
-            cmd = f"""display notification " Chaning wallpaper to {image} daemon" with title\
-            "WallpDesk" subtitle "Wallpaper change" """
+            cmd = f"""display notification " Chaning wallpaper to {image[0]} daemon" with title\
+            "WallpDesk" subtitle "Wallpaper change theme {image[2]}" """
             Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd.encode())
 
     def choose_last_image(self):

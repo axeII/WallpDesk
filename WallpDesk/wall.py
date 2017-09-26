@@ -5,6 +5,7 @@ This is wallpaper changer, module for changing desktop background by rules
 __author__ = 'ales lerch'
 
 import os
+import re
 import subprocess
 from multiprocessing import active_children
 
@@ -21,6 +22,7 @@ class Paper:
         self.directory = directory
         self.db = DB_lite()
         self.types = (".jpg",".png",".jpeg",".tiff")
+        self.iopm = re.compile(r'IOPowerManagement.*{(.*)}')
 
     def set_directory(self, directory):
         self.directory = directory
@@ -31,7 +33,7 @@ class Paper:
         subprocess.call(["killall", "Dock"])
 
     def set_wallpaper_with_effect(self, img, save):
-        if img:
+        if img and self.get_display_status() == 4:
             path = f"{HOME}/Library/Application Support/WallpDesk/current/"
             cmd = b"""tell application "System Events"
         tell current desktop
@@ -71,6 +73,17 @@ class Paper:
                 print(f"{self.directory} folder not found")
         else:
             print("Folder for images not found")
+
+    def get_display_status(self):
+        """ return iokit powermanagement status if 4 then display is on elif 1
+        screen is off"""
+        output = subprocess.check_output(
+            'ioreg -w 0 -c IODisplayWrangler -r IODisplayWrangler'.split()).decode('utf-8')
+        status = self.iopm.search(output).group(1)
+        power_state = dict((k[1:-1], v) for (k, v) in
+                (x.split('=') for x in status.split(',')))["CurrentPowerState"]
+        return int(power_state)
+
 
     def shut_down(self, name):
         #in future update use mutltiprocessing.queue for sperate processes
