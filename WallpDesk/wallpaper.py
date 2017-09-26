@@ -87,7 +87,7 @@ class Editor(wall.Paper):
     def check_alive_process(self):
         return self.process.is_alive()
 
-    def choose_random_image(self, _alive):
+    def choose_random_image(self, _alive = False):
         """choose dark or light based on time but random"""
         self.sync_with_db()
         data_h = horizon.get_horizon_time(self.db.get_zone())
@@ -106,7 +106,10 @@ class Editor(wall.Paper):
             images = self.db.get_items(type_ = theme)
             image = images[random.choice(list(images.keys()))]
             print(image)
-            super().set_wallpaper_with_effect(f"{image[1]}/{image[0]}", True)
+            try:
+                super().set_wallpaper_with_effect(f"{image[1]}/{image[0]}", True)
+            except Exception as e:
+                print(e)
             cmd = f"""display notification " Chaning wallpaper to {image} daemon" with title\
             "WallpDesk" subtitle "Wallpaper change" """
             Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd.encode())

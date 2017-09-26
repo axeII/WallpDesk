@@ -118,7 +118,10 @@ Use: @{command}file (readme.md)""", dimensions=(210, 250)).run()
     @rumps.clicked("Next Wallpaper")
     def next_wallpaper(self,_):
         print("Clicked next wallpaer")
-        self.editor.choose_random_image()
+        try:
+            self.editor.choose_random_image(self.editor.check_alive_process())
+        except Exception as e:
+            print(e)
 
     @rumps.clicked("Previous Wallpaper")
     def previous_wallpaper(self,_):
