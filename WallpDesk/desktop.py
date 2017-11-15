@@ -121,7 +121,8 @@ class Daemon(wall.Paper):
                     #so far there are no special tasks for more commands
                     command_list[commands[0]](file_name,commands)
             else:
-                print("calling command",commands)
+                #takes lot cpu for print use only for debuging
+                #print("calling command",commands)
                 command_list[commands[0]]((original,file_name))
         except KeyError:
             pass
