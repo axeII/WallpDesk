@@ -24,6 +24,7 @@ def check_image_color(image):
     if not os.path.isfile(image):
         return "Image not found"
 
+    #split the image for four squares calucate averate pixel for them and take higest value
     try:
         img = cv2.imread(image)
         average_color_per_row = numpy.average(img, axis=0)

@@ -7,6 +7,7 @@ __author__ = 'ales lerch'
 import os
 import wall
 import time
+import numpy
 import random
 import horizon
 import analyzer
@@ -104,6 +105,7 @@ class Editor(wall.Paper):
 
         if not _alive:
             images = self.db.get_items(type_ = theme)
+            #ranom.choice -> numpy.random
             image = images[random.choice(list(images.keys()))]
             print(image)
             try:
