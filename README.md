@@ -41,12 +41,13 @@ You will need:
 
 And build with `python3 setup.py py2app`-> WalpDesk.app
 
-##To do list:
+## To do list:
 * show remaining time to next wallapeer change
 * click on specific time -> new wallpaper
 * controll image by splitin to quaters
 * create config reading file to load rules
 * slower checking
+* updating lock screen image with new one
 
 ## Credits
 - App icon made by [Dimi Kazak](https://www.flaticon.com/authors/dimi-kazak)

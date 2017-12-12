@@ -25,8 +25,10 @@ def check_image_color(image):
         return "Image not found"
 
     #split the image for four squares calucate averate pixel for them and take higest value
+    #blure image and save to /Library/Caches as com.apple.desktop.admin.png
     try:
         img = cv2.imread(image)
+        #blur = cv2.blur(img,(5,5))
         average_color_per_row = numpy.average(img, axis=0)
         average_color = numpy.average(average_color_per_row, axis=0)
         B, G, R = tuple(average_color)
