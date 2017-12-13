@@ -109,7 +109,7 @@ class DB_lite:
         self.db.commit()
 
     def del_item(self, item_name):
-        self.cursor.execute(f"""DELETE FROM wallpapers WHERE name = {item_name} """)
+        self.cursor.execute(f"""DELETE FROM wallpapers WHERE name = "{item_name}" """)
         self.db.commit()
 
     def del_last_history(self):
