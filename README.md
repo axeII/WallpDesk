@@ -1,5 +1,5 @@
 # WallpDesk
-[![Build Status](https://travis-ci.org/L3rchal/WallpDesk.svg?branch=master)](https://travis-ci.org/L3rchal/WallpDesk)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![Build Status](https://travis-ci.org/L3rchal/WallpDesk.svg?branch=master)](https://travis-ci.org/L3rchal/WallpDesk)
 
 `WallpDesk` is simple lightweight macOS application only displayed in menu bar. Application can change users wallpaper image "darkness" and time (e.g. At night only dark wallpapers will be choosed from specific foled). Anohter feature is moving files on desktop just by renaming them. 
 
@@ -48,6 +48,7 @@ And build with `python3 setup.py py2app`-> WalpDesk.app
 * create config reading file to load rules
 * slower checking
 * updating lock screen image with new one
+* new mode for changing only if mode time changes
 
 ## Credits
 - App icon made by [Dimi Kazak](https://www.flaticon.com/authors/dimi-kazak)
