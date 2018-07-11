@@ -20,7 +20,9 @@ ifdef PYTHON3
 	@pip3 install numpy --user
 	@pip3 install opencv-python --user
 	@pip3 install astral --user
-	@pip3 install python-dateutil
+	@pip3 install python-dateutil --user
+	@pip3 install Pillow --user
+	@pip3 install getch --user
 else
 	@echo $(ccred)"[Error] python3.6 is not installed... cannot continue"$(ccend)
 endif
