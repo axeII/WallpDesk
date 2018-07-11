@@ -1,4 +1,4 @@
-"""WallpDesk
+"""__main__.py
 
 Simple os x application for setting wallpaper and
 desktop file name commands
@@ -8,96 +8,103 @@ TO DO:
 """
 __author__ = 'ales lerch'
 
+import os
+import getch
 import argparse
-from wallpaper import Editor
-from desktop import Daemon
 from os.path import isfile
 from database import DB_lite, HOME
+from wallpaper_daemon import WallpaperDaemon
+from desktop_daemon import DesktopDaemon
 from subprocess import Popen, PIPE, call
 
-def argparse():
+def argparse_():
     parser = argparse.ArgumentParser()
     parser.add_argument(
             'urls', nargs='*', help='Url of thread with images, Multiple urls in one command is posssible', default =[]
             )
-    parser.add_argument('-r', '--reload', action='store_true', help='Refresh script every 5 minutes to check for new images')
-    parser.add_argument('-l', '--last', action='store_true', help='Show history information about downloading images')
-    parser.add_argument('-s', '--selenium', action='store_true', help='Activate selenium mode to load site with healess mode (use for sites that load iamges later)')
+    parser.add_argument('-r', '--reload', action='store_true', help='Realod configure file')
     parser.add_argument('-i', '--ignore', action='store_true', help='Ignore title setup just use founded on site')
     return parser.parse_args()
 
+def init_stuff():
+    arguments = argparse_()
+    inst_database = DB_lite()
+    def_wall_path = inst_database.get_wall_path()
+    inst_editor = WallpaperDaemon()
+    inst_walpaper = DesktopDaemon()
+    return (inst_walpaper, inst_database, inst_editor, def_wall_path)
 
-def main(path_):
-    db = DB_lite()
-    #default_wall = self.db.get_wall_path()
-    editor = Editor()
-    desktop = Daemon()
+def main(path_to_directory):
+    """
+    editor: for chaning wallpaper, needs direcotry from taking images
+    db: application databse
+    dameon: desktop dameon for supporting desktop function eg: @trash_test.file
+    """
+    assert path_to_directory
+    install(path_to_directory)
+    # init stuff 
+    i_wallpaper, i_db, i_editor, default_wall = init_stuff()
+    if not default_wall:
+        default_wall = setup_directory(None, i_db, i_editor)
+    activate_desktop(i_wallpaper) 
+    activate_wallpaper(i_editor, default_wall)
+    while True:
+        if getch.getch() == 'q':
+            quit()
 
-def resest_library(editor):
+def reset_library(editor):
     if editor:
         editor.reset_library()
 
-def setup_directory():
+def setup_directory(default_wall, db, editor):
     cmd = b"""choose folder with prompt "Please select an output folder:" """
     proc = Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE)
     file_path, _ = proc.communicate(cmd)
     file_path = file_path.decode("utf-8").replace("alias Macintosh HD",'').replace('\n','').replace(':','/')
-    if self.default_wall != file_path and proc.returncode == 0:
+    if default_wall != file_path and proc.returncode == 0:
         print(file_path)
-        self.default_wall = file_path
-        self.db.set_wall_path(file_path)
-        self.editor.set_loading_dir(self.default_wall)
+        default_wall = file_path
+        db.set_wall_path(file_path)
+        editor.set_loading_dir(default_wall)
+        return default_wall
+    return None
 
-def activate_desktop():
+def activate_desktop(desktop):
     cmd = b"""display notification "You are now running desktop daemon" with title\
             "WallpDesk" subtitle "Desktop Activation" """
     Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd)
-    print("Activating desktop manager")
-    self.desktop.shut_down("P_desktop_manager")
-    self.desktop.run()
+    print("[INFO] Activating desktop manager")
+    #desktop.shut_down("P_desktop_manager")
+    desktop.run()
 
-def activate_wallpaper(editor, def_wallapers_path, title):
+def activate_wallpaper(editor, def_wallapers_path):
     try:
         if def_wallapers_path:
-            cmd = f"""display notification "You are now running wallpaper for {sender.title} daemon" with title\
-                    "WallpDesk" subtitle "Wallpaper Activation" """
+            cmd = f"""display notification "You are now running wallpaper for daemon" with title "walld" subtitle "Wallpaper Activation" """
             Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd.encode())
-            r_time = {"5 minutes": 300,"15 minutes": 900,"30 minutes": 1800, "1 hour": 3600}
-            try:
-                #print(sender.title,r_time[str(sender.title)])
-                #print(r_time[str(sender.title)])
-                editor.time = r_time[str(title)]
-                editor.shut_down("P_changing_image")
-                editor.run(self.editor.check_alive_process())
-            except KeyError:
-                pass
-                #(f"{sender.title} key not an option!")
-                #if not any([y.sate for y in [ for x in self.menu["Activate Wallpaper"]]):
-                #list_ = []
-                #for aw in self.default_times:
-                #    list_.append(self.menu["Activate Wallpaper"][aw].state)
-                #if not any(list_):
-                #    print("killing process P_changing_image")
-                #    self.editor.shut_down("P_changing_image")
+            #editor.time = r_time[str(title)]
+            #editor.shut_down("P_changing_image")
+            editor.run()
         else:
-            print("No input path for images set!")
-    except Exception as e:
-        print(e)
+            print("[ERROR] Path with images had not been set!")
+    except Exception as err:
+        print(err)
 
-def next_wallpaper():
-    print("Clicked next wallpaer")
+"""def next_wallpaper():
+    # depreciated
     try:
         self.editor.choose_random_image(self.editor.check_alive_process())
     except Exception as e:
         print(e)
 
 def previous_wallpaper(self,_):
-    print("Clicked previous wallpaer")
+    # depreciated
     self.editor.choose_last_image()
+"""
 
-def install():
-    #os.makedirs(path_, exist_ok=True)
-    pass
+def install(path):
+    os.makedirs(path, exist_ok=True)
 
 if __name__ == "__main__":
-    main(f"{HOME}/Library/Application Support/WallpDesk")
+    #main(f"{HOME}/Library/Application Support/WallpDesk")
+    main(f"{HOME}/.walld")

@@ -12,7 +12,7 @@ HOME = os.getenv("HOME")
 
 class DB_lite:
 
-    def __init__(self,path_to_db = f"{HOME}/Library/Application Support/WallpDesk/"):
+    def __init__(self,path_to_db = f"{HOME}/.walld/"):
         try:
             self.db = sqlite3.connect(f"{path_to_db}pydesktop.db", check_same_thread=False)
         except Exception:

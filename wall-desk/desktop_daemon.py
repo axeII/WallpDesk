@@ -6,30 +6,31 @@ __author__ = 'ales lerch'
 
 import os
 import re
-import wall
 import time
 import shutil
 import subprocess
 from enum import Enum
 from database import HOME
+from wallpaper import Wallpaper
 from multiprocessing import Process
 
 class Lexer_state(Enum):
-    s = 1
+    start = 1
     word = 2
     operation = 3
 
-class Daemon(wall.Paper):
+class DesktopDaemon(Wallpaper):
 
     def __init__(self, delay = 5):
         super().__init__(f"{HOME}/Desktop/")
 
     def check_desktop(self):
         while True:
-            time.sleep(0.6)
-            super().get_images_files(any_ = True)
-            for file_ in filter(lambda x: x.startswith('@'), self.img_files):
-                self.evaluate(self.lexer(file_))
+            time.sleep(1.5)
+            super().get_file_images(True)
+            for supported_file_name in filter(lambda data: data.startswith('@'), self.img_files):
+                print(supported_file_name)
+                self.evaluate(self.lexer(supported_file_name))
 
     def run(self):
         Process(target=self.check_desktop, name = "P_desktop_manager", daemon = True).start()
@@ -40,12 +41,12 @@ class Daemon(wall.Paper):
         token = ""
         command = ""
         #commands = []
-        state = Lexer_state.s
+        state = Lexer_state.start
         identify = re.compile("[a-zA-Z0-9_\.-]+")
         orginal = text
 
         while text != "":
-            if state == Lexer_state.s:
+            if state == Lexer_state.start:
                 if text[0] == ' ':
                     text = text[1:]
                 elif text[0] == '@':
@@ -69,7 +70,7 @@ class Daemon(wall.Paper):
                     text = text[1:]
                     #commands.append(command.lower())
                     #command = ""
-                    state = Lexer_state.s
+                    state = Lexer_state.start
 
             elif state == Lexer_state.word:
                 if identify.match(text[0]):
@@ -77,7 +78,7 @@ class Daemon(wall.Paper):
                     text = text[1:]
                 else:
                     #should contiue? file_name should be done
-                    state = Lexer_state.s
+                    state = Lexer_state.start
 
         return (orginal, token,[command])
 
@@ -89,6 +90,7 @@ class Daemon(wall.Paper):
                     f"{HOME}/Desktop/{file_}")
 
         original, file_name, commands = args
+        # refcatoring needed for this ugly thing bellow
         command_list = {
                 "pixiv": lambda n :
                 subprocess.call(["mv","-n",f"{HOME}/Desktop/{n[0]}",
@@ -111,18 +113,17 @@ class Daemon(wall.Paper):
                 "wall" : lambda n : desktop(n[0], n[1]),
                 }
 
-        #control inputs
+        # control inputs
         try:
             if len(commands) > 1:
-                #more commands
+                # more commands
                 if len(commands) == 2:
                     command_list[commands[0]](file_name,commands[1])
                 else:
-                    #so far there are no special tasks for more commands
+                    # so far there are no special tasks for more commands
                     command_list[commands[0]](file_name,commands)
             else:
-                #takes lot cpu for print use only for debuging
-                #print("calling command",commands)
+                # print("calling command",commands)
                 command_list[commands[0]]((original,file_name))
         except KeyError:
             pass
