@@ -2,7 +2,7 @@
 
 This is wallpaper changer, module for changing desktop background by rules
 """
-__author__ = 'ales lerch'
+__author__ = "ales lerch"
 
 import os
 import time
@@ -15,8 +15,8 @@ from wallpaper import Wallpaper
 from subprocess import Popen, PIPE
 from multiprocessing import Process
 
-class WallpaperDaemon(Wallpaper):
 
+class WallpaperDaemon(Wallpaper):
     def __init__(self):
         """modules, load image to database by name,path,type as dict/obj"""
         self.set_timer()
@@ -44,24 +44,28 @@ class WallpaperDaemon(Wallpaper):
         super().get_image_files()
         if sorted(self.img_files) != sorted(self.db.get_names()):
             print(f"[INFO] Loading images from {self.directory}")
-            for image in list(filter(lambda file_: file_ not in self.db.get_names(), self.img_files)):
+            for image in list(
+                filter(lambda file_: file_ not in self.db.get_names(), self.img_files)
+            ):
                 data = {
-                        "name" : os.path.basename(image),
-                        "path" : os.path.abspath(self.directory),
-                        "type" : analyzer.check_image_color(f"{os.path.abspath(self.directory)}/{image}"),
-                        }
+                    "name": os.path.basename(image),
+                    "path": os.path.abspath(self.directory),
+                    "type": analyzer.check_image_color(
+                        f"{os.path.abspath(self.directory)}/{image}"
+                    ),
+                }
                 print(f"[INFO] Adding image: {image}")
-                self.db.new_item("wallpapers",data)
+                self.db.new_item("wallpapers", data)
             print("[INFO] All images have been loaded into database")
             cmd = b"""display notification "All images are loaded to database" with title "WallpDesk" subtitle "Database synchronization" """
-            Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd)
+            Popen(["osascript", "-"], stdin=PIPE, stdout=PIPE).communicate(cmd)
         print("Database with images set!")
 
-    def set_timer(self, seconds = 3600):
+    def set_timer(self, seconds=3600):
         """ Based on time wallpaper can change"""
         self.time = seconds
 
-    def set_directory(self,directory):
+    def set_directory(self, directory):
         """set directory for choosing images to set as wallaper desktop,
         try to call backup direcotry if empty failed raise error"""
         self.directory = directory
@@ -90,17 +94,21 @@ class WallpaperDaemon(Wallpaper):
         data_h = horizon.get_horizon_time(self.db.get_zone())
         if data_h["timezone"]:
             self.db.set_timezone(data_h["timezone"])
-        hour, sunset, sunrise = (data_h["today_time"][0], data_h["sunset"][0], data_h["sunrise"][0])
+        hour, sunset, sunrise = (
+            data_h["today_time"][0],
+            data_h["sunset"][0],
+            data_h["sunrise"][0],
+        )
 
-        if hour >= sunset-2 and hour < sunset+1:
+        if hour >= sunset - 2 and hour < sunset + 1:
             theme = "evening"
         elif hour >= sunset or (hour >= 0 and hour < sunrise):
             theme = "dark"
         else:
             theme = "light"
 
-        images = self.db.get_items(type_ = theme)
-        #ranom.choice -> numpy.random
+        images = self.db.get_items(type_=theme)
+        # ranom.choice -> numpy.random
         image = images[random.choice(list(images.keys()))]
         print(image)
         try:
@@ -109,7 +117,7 @@ class WallpaperDaemon(Wallpaper):
             print(e)
         cmd = f"""display notification " Chaning wallpaper to {image[0]} daemon" with title\
         "WallpDesk" subtitle "Wallpaper change theme {image[2]}" """
-        Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd.encode())
+        Popen(["osascript", "-"], stdin=PIPE, stdout=PIPE).communicate(cmd.encode())
 
     """def choose_last_image(self):
         self.sync_with_db()
@@ -124,6 +132,8 @@ class WallpaperDaemon(Wallpaper):
             time.sleep(self.time)
             self.choose_random_image()
 
-    def run(self, alive = None):
+    def run(self, alive=None):
         print(f"[INFO] Running editor with delay time: {self.time}")
-        Process(target=self.changing_image, args=(),name="P_changing_image",daemon=True).start()
+        Process(
+            target=self.changing_image, args=(), name="P_changing_image", daemon=True
+        ).start()

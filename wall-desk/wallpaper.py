@@ -2,7 +2,7 @@
 
 This is wallpaper changer, module named "Paper" for changing desktop background by rules
 """
-__author__ = 'ales lerch'
+__author__ = "ales lerch"
 
 import os
 import re
@@ -15,21 +15,21 @@ try:
 except ModuleNotFoundError:
     from .database import DB_lite, HOME
 
-class Wallpaper:
 
+class Wallpaper:
     def __init__(self, directory):
         self.img_files = []
         self.all_files = []
         self.db = DB_lite()
         self.interrupted = False
         self.directory = directory
-        self.iopm = re.compile(r'IOPowerManagement.*{(.*)}')
-        self.supported_types = [".jpg",".png",".jpeg",".tiff"]
+        self.iopm = re.compile(r"IOPowerManagement.*{(.*)}")
+        self.supported_types = [".jpg", ".png", ".jpeg", ".tiff"]
 
     def set_directory(self, directory):
         self.directory = directory
 
-    def set_wallpaper(self,img):
+    def set_wallpaper(self, img):
         db_file = f"{HOME}/Library/Application Support/Dock/desktoppicture.db"
         call(["sqlite3", db_file, f"update data set value = '{img}'"])
         call(["killall", "Dock"])
@@ -52,7 +52,7 @@ class Wallpaper:
                 set change interval to 5.0
             end tell
         end tell"""
-            Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd.encode())
+            Popen(["osascript", "-"], stdin=PIPE, stdout=PIPE).communicate(cmd.encode())
             for file_ in os.listdir(path):
                 call(["mv", f"{path}/{file_}", f"{HOME}/.Trash/"])
                 if save:
@@ -62,12 +62,17 @@ class Wallpaper:
             print("No image found in history")
 
     def save_current_wallpaper(self, wallp):
-        self.db.new_item("history",{"name": wallp, "path": self.directory})
+        self.db.new_item("history", {"name": wallp, "path": self.directory})
 
     def get_image_files(self):
         self.img_files = []
         if self.directory and os.path.isdir(self.directory):
-            for img_file in list(filter(lambda data: data not in self.img_files or get_all, os.listdir(self.directory))):
+            for img_file in list(
+                filter(
+                    lambda data: data not in self.img_files or get_all,
+                    os.listdir(self.directory),
+                )
+            ):
                 if pathlib.Path(img_file).suffix in self.supported_types:
                     self.img_files.append(img_file)
         else:
@@ -84,10 +89,12 @@ class Wallpaper:
         else 1 screen is off
         """
         output = check_output(
-            'ioreg -w 0 -c IODisplayWrangler -r IODisplayWrangler'.split()).decode('utf-8')
+            "ioreg -w 0 -c IODisplayWrangler -r IODisplayWrangler".split()
+        ).decode("utf-8")
         status = self.iopm.search(output).group(1)
-        power_state = dict((k[1:-1], v) for (k, v) in
-                (x.split('=') for x in status.split(',')))["CurrentPowerState"]
+        power_state = dict(
+            (k[1:-1], v) for (k, v) in (x.split("=") for x in status.split(","))
+        )["CurrentPowerState"]
         return int(power_state)
 
     def shut_down(self, name):
