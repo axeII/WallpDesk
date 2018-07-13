@@ -24,7 +24,6 @@ ifdef PYTHON3
 	@pip3 install Pillow --user
 	@pip3 install getch --user
 	@pip3 install pyyaml --user
-	@pip3 install pyobj --user
 else
 	@echo $(ccred)"[Error] python3.6 is not installed... cannot continue"$(ccend)
 endif

@@ -1,11 +1,11 @@
 # WallpDesk
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![Build Status](https://travis-ci.org/L3rchal/WallpDesk.svg?branch=master)](https://travis-ci.org/L3rchal/WallpDesk)
 
-`WallpDesk` is simple lightweight macOS application only displayed in menu bar. Application can change users wallpaper image "darkness" and time (e.g. At night only dark wallpapers will be choosed from specific foled). Anohter feature is moving files on desktop just by renaming them. 
+`walld` application for updating files on desktop only and setting background wallpaper based on his color spectre and time.
 
-![alt-text-1](https://imgur.com/8YKlbk2.png "title-1") ![alt-text-2](https://imgur.com/FpY5tFB.png "title-2")
+## py2app is depreciated, meaning I had to remove gui from this project, working on new tool in swift
 
-Application doesn't have so far any gui so only control is via menu bar. Whole application is written in python3 using few external libraries and sqlite3 database.
+<!--![alt-text-1](https://imgur.com/8YKlbk2.png "title-1") ![alt-text-2](https://imgur.com/FpY5tFB.png "title-2")-->
 
 ## Features
 
@@ -37,17 +37,14 @@ You will need:
 * python-opencv
 * python-dateutil
 * astral
-* and py2app
+* ~and py2app~
 
 And build with `python3 setup.py py2app`-> WalpDesk.app
 
 ## To do list:
-* show remaining time to next wallapeer change
-* click on specific time -> new wallpaper
+* ~Show remaining time to next wallapeer change~
+* ~click on specific time -> new wallpaper~
 * controll image by splitin to quaters
-* create config reading file to load rules
-* slower checking
-* updating lock screen image with new one
 * new mode for changing only if mode time changes
 
 ## Credits

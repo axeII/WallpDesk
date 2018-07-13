@@ -30,7 +30,7 @@ class Wallpaper:
         self.directory = directory
 
     def set_wallpaper(self,img):
-        db_file = f"{HOME}/.walld/Dock/desktoppicture.db"
+        db_file = f"{HOME}/Library/Application Support/Dock/desktoppicture.db"
         call(["sqlite3", db_file, f"update data set value = '{img}'"])
         call(["killall", "Dock"])
 
@@ -52,7 +52,7 @@ class Wallpaper:
                 set change interval to 5.0
             end tell
         end tell"""
-            #Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd.encode())
+            Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd.encode())
             for file_ in os.listdir(path):
                 call(["mv", f"{path}/{file_}", f"{HOME}/.Trash/"])
                 if save:
