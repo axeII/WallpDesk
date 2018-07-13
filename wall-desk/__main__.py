@@ -13,9 +13,9 @@ import getch
 import argparse
 from os.path import isfile
 from database import DB_lite, HOME
-from wallpaper_daemon import WallpaperDaemon
 from desktop_daemon import DesktopDaemon
-from subprocess import Popen, PIPE, call
+from subprocess import call, PIPE, Popen
+from wallpaper_daemon import WallpaperDaemon
 
 def argparse_():
     parser = argparse.ArgumentParser()
@@ -48,9 +48,11 @@ def main(path_to_directory):
         default_wall = setup_directory(None, i_db, i_editor)
     activate_desktop(i_wallpaper) 
     activate_wallpaper(i_editor, default_wall)
-    while True:
-        if getch.getch() == 'q':
-            quit()
+    try:
+        while getch.getch() != 'q':
+            pass
+    except KeyboardInterrupt:
+        quit()
 
 def reset_library(editor):
     if editor:
@@ -58,7 +60,7 @@ def reset_library(editor):
 
 def setup_directory(default_wall, db, editor):
     cmd = b"""choose folder with prompt "Please select an output folder:" """
-    proc = Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE)
+    Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd)
     file_path, _ = proc.communicate(cmd)
     file_path = file_path.decode("utf-8").replace("alias Macintosh HD",'').replace('\n','').replace(':','/')
     if default_wall != file_path and proc.returncode == 0:
@@ -80,8 +82,8 @@ def activate_desktop(desktop):
 def activate_wallpaper(editor, def_wallapers_path):
     try:
         if def_wallapers_path:
-            cmd = f"""display notification "You are now running wallpaper for daemon" with title "walld" subtitle "Wallpaper Activation" """
-            Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd.encode())
+            cmd = b"""display notification "You are now running wallpaper for daemon" with title "walld" subtitle "Wallpaper Activation" """
+            Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd)
             #editor.time = r_time[str(title)]
             #editor.shut_down("P_changing_image")
             editor.run()

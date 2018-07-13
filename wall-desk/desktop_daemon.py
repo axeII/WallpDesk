@@ -6,6 +6,7 @@ __author__ = 'ales lerch'
 
 import os
 import re
+import yaml
 import time
 import shutil
 import subprocess
@@ -14,53 +15,62 @@ from database import HOME
 from wallpaper import Wallpaper
 from multiprocessing import Process
 
-class Lexer_state(Enum):
-    start = 1
-    word = 2
-    operation = 3
+class LexerState(Enum):
+    Q_start = 1
+    Q_word = 2
+    Q_operation = 3
+
+class Token:
+    def __init__(self, original_name, token_file_name = "", token_command = None):
+        self.origin_name = original_name
+        self.file_name = token_file_name
+        self.command = token_command
+
+    def __repr__(self):
+        return f"Token::<original name: {self.origin_name}, file name: {self.file_name}, command: {self.command}>"
 
 class DesktopDaemon(Wallpaper):
 
     def __init__(self, delay = 5):
         super().__init__(f"{HOME}/Desktop/")
+        self.path_to_conf = f"{HOME}/.walld/config.yaml"
 
     def check_desktop(self):
         while True:
             time.sleep(1.5)
-            super().get_file_images(True)
-            for supported_file_name in filter(lambda data: data.startswith('@'), self.img_files):
-                print(supported_file_name)
+            super().get_all_files()
+            for supported_file_name in filter(lambda data: data.startswith('@'), self.all_files):
                 self.evaluate(self.lexer(supported_file_name))
 
     def run(self):
         Process(target=self.check_desktop, name = "P_desktop_manager", daemon = True).start()
 
-    def lexer(self,text):
-        """ token stands for file name, commands are operations
-        that should be done"""
-        token = ""
-        command = ""
-        #commands = []
-        state = Lexer_state.start
+    def lexer(self, text, f_name="", command=""):
+        """
+        f_name stands for file name,
+        commands are operations
+        """
+        original = text
         identify = re.compile("[a-zA-Z0-9_\.-]+")
-        orginal = text
+        state = LexerState.Q_start
 
         while text != "":
-            if state == Lexer_state.start:
+            if state == LexerState.Q_start:
                 if text[0] == ' ':
                     text = text[1:]
                 elif text[0] == '@':
                     text = text[1:]
-                    state = Lexer_state.operation
+                    state = LexerState.Q_operation
                 elif identify.match(text[0]):
-                    state = Lexer_state.word
-                    token += text[0]
+                    state = LexerState.Q_word
+                    f_name += text[0]
                     text = text[1:]
                 else:
-                    #print("[Error]Not valid charatect")
-                    text = text[1:]
+                    print("[Error] Not valid charatect")
+                    # text = text[1:]
+                    return None
 
-            elif state == Lexer_state.operation:
+            elif state == LexerState.Q_operation:
                 if text[0] == '{':
                     text = text[1:]
                 elif identify.match(text[0]):
@@ -68,63 +78,35 @@ class DesktopDaemon(Wallpaper):
                     text = text[1:]
                 elif text[0] == '}':
                     text = text[1:]
-                    #commands.append(command.lower())
-                    #command = ""
-                    state = Lexer_state.start
+                    state = LexerState.Q_start
+                else:
+                    return None
 
-            elif state == Lexer_state.word:
+            elif state == LexerState.Q_word:
                 if identify.match(text[0]):
-                    token += text[0]
+                    f_name += text[0]
                     text = text[1:]
                 else:
-                    #should contiue? file_name should be done
-                    state = Lexer_state.start
-
-        return (orginal, token,[command])
-
-    def evaluate(self, args):
-
-        def desktop(org, file_):
-            subprocess.call(["mv", "-n", f"{HOME}/Desktop/{org}",f"{HOME}/Desktop/{file_}"])
-            super(Daemon,self).set_wallpaper(
-                    f"{HOME}/Desktop/{file_}")
-
-        original, file_name, commands = args
-        # refcatoring needed for this ugly thing bellow
-        command_list = {
-                "pixiv": lambda n :
-                subprocess.call(["mv","-n",f"{HOME}/Desktop/{n[0]}",
-                    f"{HOME}/Pictures/pix-girls/{n[1]}"]),
-                "girls": lambda n :
-                subprocess.call(["mv","-n",f"{HOME}/Desktop/{n[0]}",
-                    f"{HOME}/Pictures/Madchen/{n[1]}"]),
-                "img": lambda n :
-                subprocess.call(["mv","-n",f"{HOME}/Desktop/{n[0]}",
-                    f"{HOME}/Pictures/{n[1]}"]),
-                "meme": lambda n : subprocess.call(["mv",
-                    "-n",f"{HOME}/Desktop/{n[0]}",
-                    f"{HOME}/Pictures/Meme/{n[1]}"]),
-                "daytime" : lambda n :
-                subprocess.call(["mv","-n",f"{HOME}/Desktop/{n[0]}",f"{HOME}/TimeDayWal/{n[1]}"]),
-                "mv" : lambda f, t :
-                subprocess.call(["mv","-n",f"{HOME}/Desktop/{f}",f"{os.path.abspath(t)}"]),
-                "trash" : lambda n :
-                subprocess.call(["mv",f"{HOME}/Desktop/{n[0]}",f"{HOME}/.Trash/{n[1]}"]),
-                "wall" : lambda n : desktop(n[0], n[1]),
-                }
-
-        # control inputs
-        try:
-            if len(commands) > 1:
-                # more commands
-                if len(commands) == 2:
-                    command_list[commands[0]](file_name,commands[1])
+                    state = LexerState.Q_start
+            """if text != "":
+                if state == LexerState.Q_word:
+                    return Token(original, f_name, command)
+                elif state == LexerState.Q_operation:
+                    return Token(original, f_name, command)
                 else:
-                    # so far there are no special tasks for more commands
-                    command_list[commands[0]](file_name,commands)
-            else:
-                # print("calling command",commands)
-                command_list[commands[0]]((original,file_name))
-        except KeyError:
-            pass
+                    return None"""
+        return Token(original, f_name, command)
 
+    def evaluate(self, token, parsed_data=""):
+        assert token
+        with open(self.path_to_conf,'r') as conf:
+            try:
+                parsed_data = yaml.load(conf)
+            except yaml.YAMLError as exc:
+                print(exc)
+        if token.command in list(parsed_data["paths"].keys()):
+            subprocess.call(["mv","-n",f"{HOME}/Desktop/{token.origin_name}",os.path.join(parsed_data["paths"][token.command],f"{token.file_name}")])
+        elif os.path.isdir(token.command):
+            subprocess.call(["mv","-n",f"{HOME}/Desktop/{token.origin_name}",f"{token.command}/{token.file_name}"])
+        else:
+            print("[ERROR] Could not execute any action")

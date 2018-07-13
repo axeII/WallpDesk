@@ -41,7 +41,7 @@ class WallpaperDaemon(Wallpaper):
         can work with database at same time
         """
         assert test_path
-        super().get_file_images()
+        super().get_image_files()
         if sorted(self.img_files) != sorted(self.db.get_names()):
             print(f"[INFO] Loading images from {self.directory}")
             for image in list(filter(lambda file_: file_ not in self.db.get_names(), self.img_files)):
@@ -111,13 +111,14 @@ class WallpaperDaemon(Wallpaper):
         "WallpDesk" subtitle "Wallpaper change theme {image[2]}" """
         Popen(["osascript", '-'], stdin=PIPE, stdout=PIPE).communicate(cmd.encode())
 
-    def choose_last_image(self):
+    """def choose_last_image(self):
         self.sync_with_db()
         img = self.db.get_last_wallpaper()
         super().set_wallpaper_with_effect(f"{img[0]}/{img[1]}", False)
-        self.db.del_last_history()
+        self.db.del_last_history()"""
 
     def changing_image(self):
+        self.choose_random_image()
         while True:
             print("Running, quit application by hitting 'q'")
             time.sleep(self.time)
