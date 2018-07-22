@@ -35,7 +35,7 @@ class Token:
 class DesktopDaemon(Wallpaper):
     def __init__(self, delay=5):
         super().__init__(f"{HOME}/Desktop/")
-        self.path_to_conf = f"{HOME}/.walld/config.yaml"
+        self.path_to_conf = f"{HOME}/.walld/config.yml"
 
     def check_desktop(self):
         while True:

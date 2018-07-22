@@ -6,7 +6,7 @@
 DIR="./wall-desk"
 
 # Values
-PYTHON3 := $(shell command -v python3 2>/dev/null)
+PYTHON3 := $(shell command -v python3.7 2>/dev/null)
 PIP3 := $(command -v pip3 2>/dev/null)
 
 install:
@@ -25,7 +25,7 @@ ifdef PYTHON3
 	@pip3 install getch --user
 	@pip3 install pyyaml --user
 else
-	@echo $(ccred)"[Error] python3.6 is not installed... cannot continue"$(ccend)
+	@echo $(ccred)"[Error] python3.7 is not installed exiting..."$(ccend)
 endif
 
 build:
